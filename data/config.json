@@ -5,6 +5,9 @@
     "debug": true,
     "secret_key": "cokeserver2022"
   },
+  "web": {
+    "title": "云深不知处"
+  },
   "dispatch": {
     "global": "http://172.10.3.5:21041",
     "local": {
