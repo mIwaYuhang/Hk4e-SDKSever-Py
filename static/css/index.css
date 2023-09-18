@@ -1,0 +1,21 @@
+.container {
+  background-color: #fff;
+  border-radius: 0.04rem;
+  overflow: hidden;
+  width: 96%;
+  margin: 0.3rem auto auto;
+}
+
+.content form {
+  padding: 0.2rem;
+  width: 80%;
+}
+
+.content .flash {
+  margin: 0.2rem;
+  padding: 0.1rem;
+  width: 80%;
+  text-align: center;
+  font-size: 0.15rem;
+  border-radius: 4px;
+}
