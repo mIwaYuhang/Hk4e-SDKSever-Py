@@ -1,6 +1,8 @@
 from __main__ import app
 
-from flask import request, send_from_directory, abort, render_template, flash
+from flask import request, send_from_directory, abort, render_template, flash, current_app
+from flask_mail import Message
+from flask_caching import Cache
 import random
 import string
 import json
@@ -14,6 +16,7 @@ from utils import forward_request, request_ip, get_country_for_ip, password_hash
 import define
 from config import get_config
 
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.context_processor
 def inject_config():
@@ -462,10 +465,33 @@ def account_recover():
 
     return render_template("account/recover.tmpl")
 
+@app.route('/account/send_email', methods=['POST'])
+def send_email():
+    email = request.form.get('email')
+
+    email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+    if not re.match(email_pattern, email):
+        return json_rsp_with_msg(define.RES_FAIL,"邮箱为空或邮箱格式不对",{})
+    cursor = get_db().cursor()
+    user = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
+                              (email, )).fetchone()
+    if user:
+        return json_rsp_with_msg(define.RES_FAIL,"邮箱被占用",{})
+    verification_code = ''.join(random.choices(string.digits, k=4))
+    mail = current_app.extensions['mail']
+    msg = Message(f"{get_config()['web']['title']}注册验证码", recipients=[email])
+    msg.body = f"你的注册验证码是：{verification_code}，验证码5分钟内有效"
+    try:
+        mail.send(msg)
+    except:
+        return json_rsp_with_msg(define.RES_FAIL,"未知异常，请联系管理员",{})
+    cache.set(email, verification_code, timeout=60*5)
+    return json_rsp_with_msg(define.RES_SUCCESS,"验证码发送成功，请查收邮箱。",{})
 
 @app.route('/account/register', methods=['GET', 'POST'])
 def account_register():
     cursor = get_db().cursor()
+    cached_data = cache.get(request.form.get('email'))
 
     if request.method == 'POST':
         user = cursor.execute("SELECT * FROM `accounts` WHERE `name` = ?",
@@ -474,6 +500,8 @@ def account_register():
             flash('用户名被占用了，换一个吧(❁´◡`❁)', 'error')
         elif not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', request.form.get('email')):
             flash('你确定你输入的是邮箱╰（‵□′）╯', 'error')
+        elif request.form.get('code') != cached_data and get_config()['mail']['open']:
+            flash('验证码错咯ㄟ( ▔, ▔ )ㄏ', 'error')
         elif request.form.get('password') != request.form.get('passwordv2'):
             flash('两次密码输入的都不一样，你是不是傻ㄟ( ▔, ▔ )ㄏ', 'error')
         elif len(request.form.get('password')) < get_config()["security"]["min_password_len"]:
@@ -486,7 +514,7 @@ def account_register():
                     request.form.get('password')), define.ACCOUNT_TYPE_NORMAL, int(epoch()))
             )
             flash('注册成功了，快点进游戏吧ψ(｀∇´)ψ', 'success')
-
+            cache.delete(request.form.get('email'))
     return render_template("account/register.tmpl")
 
 
