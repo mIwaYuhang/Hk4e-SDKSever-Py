@@ -23,8 +23,32 @@ def inject_config():
     config = get_config()
     return {'config': config}
 
+#=====================SDKServer=====================#
+# 首页
+@app.route('/')
+@app.route('/sandbox/index.html', methods=['GET'])
+def account_index():
+    return render_template("account/index.tmpl")
 
-# global dispatch
+# 检查SDK配置(https://testing-abtest-api-data-sg.mihoyo.com)
+@app.route('/data_abtest_api/config/experiment/list', methods=['GET', 'POST'])
+def abtest_config_experiment_list():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": []
+    })
+
+#=====================状态收集=====================#
+# log收集
+@app.route('/log', methods=['POST'])
+@app.route('/log/sdk/upload', methods=['POST'])
+@app.route('/crash/dataUpload', methods=['POST'])
+@app.route('/sdk/dataUpload', methods=['POST'])
+@app.route('/common/h5log/log/batch', methods=['POST'])
+def sdk_log():
+    return json_rsp(define.RES_SUCCESS, {})
+
+#=====================Dispatch配置=====================#
+# 全局dispatch
 @app.route('/query_region_list', methods=['GET'])
 def query_region_list():
     try:
@@ -46,67 +70,89 @@ def query_cur_region(name):
         print(f"Unexpected {err=}, {type(err)=} while forwarding request")
         abort(500)
 
+#=====================用户注册模块=====================#
+# 游戏账号注册
+@app.route('/account/register', methods=['GET', 'POST'])
+def account_register():
+    cursor = get_db().cursor()
+    cached_data = cache.get(request.form.get('email'))
 
-# sdk logging
-@app.route('/log', methods=['POST'])
-@app.route('/log/sdk/upload', methods=['POST'])
-@app.route('/crash/dataUpload', methods=['POST'])
-@app.route('/sdk/dataUpload', methods=['POST'])
-@app.route('/common/h5log/log/batch', methods=['POST'])
-def sdk_log():
-    return json_rsp(define.RES_SUCCESS, {})
+    if request.method == 'POST':
+        user = cursor.execute("SELECT * FROM `accounts` WHERE `name` = ?",
+                              (request.form.get('username'), )).fetchone()
+        if user:
+            flash('您准备注册的用户名已被使用', 'error')
+        elif not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', request.form.get('email')):
+            flash('邮箱格式不正确', 'error')
+        elif request.form.get('code') != cached_data and get_config()['mail']['open']:
+            flash('验证码错误', 'error')
+        elif request.form.get('password') != request.form.get('passwordv2'):
+            flash('两次输入的密码不一致', 'error')
+        elif len(request.form.get('password')) < get_config()["security"]["min_password_len"]:
+            flash(
+                f"密码长度不能小于 {get_config()['security']['min_password_len']} 字节", 'error')
+        else:
+            cursor.execute(
+                "INSERT INTO `accounts` (`name`, `email`, `password`, `type`, `epoch_created`) VALUES (?, ?, ?, ?, ?)",
+                (request.form.get('username'), request.form.get('email'), password_hash(
+                    request.form.get('password')), define.ACCOUNT_TYPE_NORMAL, int(epoch()))
+            )
+            flash('游戏账号注册成功，请返回登录', 'success')
+            cache.delete(request.form.get('email'))
+    return render_template("account/register.tmpl")
 
+# 邮件验证码 用于注册
+@app.route('/account/send_email', methods=['POST'])
+def send_email():
+    email = request.form.get('email')
+    email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+    if not re.match(email_pattern, email):
+        return json_rsp_with_msg(define.RES_FAIL,"邮箱格式不正确",{})
+    cursor = get_db().cursor()
+    user = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
+                              (email, )).fetchone()
+    if user:
+        return json_rsp_with_msg(define.RES_FAIL,"邮箱已被占用",{})
+    verification_code = ''.join(random.choices(string.digits, k=4))
+    mail = current_app.extensions['mail']
+    msg = Message(f"{get_config()['web']['title']}注册验证码", recipients=[email])
+    msg.body = f"你的注册验证码是：{verification_code}，验证码5分钟内有效"
+    try:
+        mail.send(msg)
+    except:
+        return json_rsp_with_msg(define.RES_FAIL,"未知异常，请联系管理员",{})
+    cache.set(email, verification_code, timeout=60*5)
+    return json_rsp_with_msg(define.RES_SUCCESS,"验证码发送成功，请查收邮箱。",{})
 
-# sdk config
-@app.route('/data_abtest_api/config/experiment/list', methods=['GET', 'POST'])
-def abtest_config_experiment_list():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
-        "data": []
-    })
+# 找回密码(功能不可用)
+@app.route('/account/recover', methods=['GET', 'POST'])
+def account_recover():
+    if request.method == 'POST':
+        flash('服务不可用', 'error')
+    return render_template("account/recover.tmpl")
 
-
-@app.route('/hk4e_cn/mdk/shield/api/loadConfig', methods=['GET'])
-@app.route('/hk4e_global/mdk/shield/api/loadConfig', methods=['GET'])
+#=====================登录模块=====================#
+# 登录配置
+@app.route('/hk4e_cn/mdk/shield/api/loadConfig', methods=['GET','POST'])
+@app.route('/hk4e_global/mdk/shield/api/loadConfig', methods=['GET','POST'])
 def mdk_shield_api_loadConfig():
+    client = request.args.get('client', '')  # 提供默认值为空字符串
+    if client.isdigit():
+        client = define.PLATFORM_TYPE[int(client)]
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
             "client": define.PLATFORM_TYPE[int(request.args.get('client'))] if request.args.get('client').isnumeric() else request.args.get('client'),
-            "disable_mmt": True,  # disable captcha (geetest)
-            "disable_regist": False,  # ???
-            "enable_email_captcha": False,
-            "enable_ps_bind_account": False,
+            "disable_mmt": True,                     # 禁用验证码(Geetest)
+            "disable_regist": False,                 # 关闭注册
+            "enable_email_captcha": False,           # 启用邮箱验证
+            "enable_ps_bind_account": False,         # 启用与PS平台账号关联
             "game_key": request.args.get('game_key'),
             "guest": get_config()["auth"]["enable_server_guest"],
             "server_guest": get_config()["auth"]["enable_server_guest"],
-            "identity": "I_IDENTITY",  # ???
-            "name": "原神海外",  # ???
-            # CN only; controls which forms of authentication are enabled
-            "scene": define.SCENE_USER,
-            "thirdparty": []  # dont enable external login services
-        }
-    })
-
-
-@app.route('/hk4e_cn/combo/granter/api/compareProtocolVersion', methods=['POST'])
-@app.route('/hk4e_global/combo/granter/api/compareProtocolVersion', methods=['POST'])
-def combo_granter_api_protocol():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
-        "data": {
-            "modified": False,
-            "protocol": {}
-        }
-    })
-
-
-@app.route('/hk4e_cn/combo/granter/api/getConfig', methods=['GET'])
-@app.route('/hk4e_global/combo/granter/api/getConfig', methods=['GET'])
-def combo_granter_api_config():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
-        "data": {
-            "disable_ysdk_guard": True,  # ???
-            "enable_announce_pic_popup": False,  # ???
-            "protocol": False,  # ???
-            "qr_enabled": False
+            "identity": "I_IDENTITY",
+            "name": "原神海外",                       # 仅限国区用于身份验证
+            "scene": define.SCENE_USER,              
+            "thirdparty": []                         # 不启用外服务
         }
     })
 
@@ -553,3 +599,90 @@ def gacha_info(id):
 @app.route('/gacha/record/<int:type>', methods=['GET'])
 def gacha_log(type):
     return render_template("gacha/history.tmpl"), 203
+
+#=====================mi18n=====================#
+@app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-version.json', methods=['GET'])
+@app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json', methods=['GET'])
+def mi18n_version():
+    return json_rsp(define.RES_SUCCESS, {"version": 51})
+@app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-<language>.json', methods=['GET'])
+@app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-<language>.json', methods=['GET'])
+def mi18n_serve(language):
+    return send_from_directory(define.MI18N_PATH, f"{language}.json")
+
+#=====================Api功能=====================#
+# Api-Config(https://sandbox-sdk-os.hoyoverse.com)
+@app.route('/hk4e_cn/combo/granter/api/getConfig', methods=['GET'])
+@app.route('/hk4e_global/combo/granter/api/getConfig', methods=['GET'])
+def combo_granter_api_config():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "disable_ysdk_guard": True,  
+            "enable_announce_pic_popup": False,  
+            "protocol": False,  
+            "qr_enabled": False
+        }
+    })
+
+# 获取协议信息
+@app.route('/hk4e_cn/mdk/agreement/api/getAgreementInfos', methods=['GET'])
+@app.route('/hk4e_global/mdk/agreement/api/getAgreementInfos', methods=['GET'])
+def mdk_agreement_api_get():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "marketing_agreements": []
+        }
+    })
+
+# 协议比较(https://sandbox-sdk-os.hoyoverse.com)
+@app.route('/hk4e_cn/combo/granter/api/compareProtocolVersion', methods=['POST'])
+@app.route('/hk4e_global/combo/granter/api/compareProtocolVersion', methods=['POST'])
+def combo_granter_api_protocol():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "modified": False,
+            "protocol": {}
+        }
+    })
+
+# 获取SDKCombo配置信息
+@app.route('/combo/box/api/config/sdk/combo', methods=['GET'])
+def combo_box_api_config_sdk_combo():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "disable_email_bind_skip": False,  
+            "email_bind_remind": False  
+        }
+    })
+
+# 全局红点列
+@app.route('/hk4e_cn/combo/red_dot/list', methods=['POST'])
+@app.route('/hk4e_global/combo/red_dot/list', methods=['POST'])
+def combo_red_dot_list():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "infos": []                 # 基于玩家级别和uid的动态设置
+        }
+    })
+
+# 预加载
+@app.route('/combo/box/api/config/sw/precache', methods=['GET'])
+def combo_box_api_config_sw_precache():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "vals": {
+                "enable": False         # 是否加载ServiceWorker进行分析
+            }
+        }
+    })
+
+# 指纹采集？
+@app.route('/device-fp/api/getExtList', methods=['GET'])
+def device_fp_get_ext_list():
+    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        "data": {
+            "code": "200",
+            "ext_list": [],             # 列表为空表示禁用客户端指纹识别
+            "pkg_list": None
+        }
+    })
