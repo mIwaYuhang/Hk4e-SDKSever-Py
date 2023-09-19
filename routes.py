@@ -38,6 +38,7 @@ def abtest_config_experiment_list():
 @app.route('/log', methods=['POST'])
 @app.route('/log/sdk/upload', methods=['POST'])
 @app.route('/crash/dataUpload', methods=['POST'])
+@app.route('/client/event/dataUpload', methods = ['POST'])
 @app.route('/sdk/dataUpload', methods=['POST'])
 @app.route('/common/h5log/log/batch', methods=['POST'])
 def sdk_log():
@@ -128,23 +129,26 @@ def account_recover():
 
 #=====================登录模块=====================#
 # 登录配置
-@app.route('/hk4e_cn/mdk/shield/api/loadConfig', methods=['GET','POST'])
-@app.route('/hk4e_global/mdk/shield/api/loadConfig', methods=['GET','POST'])
+@app.route('/hk4e_cn/mdk/shield/api/loadConfig', methods=['GET', 'POST'])
+@app.route('/hk4e_global/mdk/shield/api/loadConfig', methods=['GET', 'POST'])
 def mdk_shield_api_loadConfig():
+    client = request.args.get('client', '')  # 提供默认值为空字符串
+    if client.isdigit():
+        client = define.PLATFORM_TYPE[int(client)]
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "client": define.PLATFORM_TYPE[int(request.args.get('client'))] if request.args.get('client').isnumeric() else request.args.get('client'),
-            "disable_mmt": True,                     # 禁用验证码(Geetest)
-            "disable_regist": False,                 # 关闭注册
-            "enable_email_captcha": False,           # 启用邮箱验证
-            "enable_ps_bind_account": False,         # 启用与PS平台账号关联
+            "client": client,
+            "disable_mmt": True,                    # 禁用验证码
+            "disable_regist": False,                # 禁止注册
+            "enable_email_captcha": False,          # 启用邮箱验证
+            "enable_ps_bind_account": False,        # 启用与PS平台相关联
             "game_key": request.args.get('game_key'),
             "guest": get_config()["auth"]["enable_server_guest"],
             "server_guest": get_config()["auth"]["enable_server_guest"],
             "identity": "I_IDENTITY",
-            "name": "原神海外",                       # 仅限国区用于身份验证
-            "scene": define.SCENE_USER,              
-            "thirdparty": []                         # 不启用外服务
+            "name": "原神海外",
+            "scene": define.SCENE_USER,
+            "thirdparty": []
         }
     })
 
@@ -507,3 +511,15 @@ def device_fp_get_ext_list():
             "pkg_list": None
         }
     })
+    
+#=====================未开发的功能=====================#
+# 新设备邮箱验证(路由指向/hk4e_global/mdk/shield/api/login)
+@app.route("/account/device/api/preGrantByTicket",methods=['POST'])
+def newEquipmentMailVerify():
+    return
+
+# 实名认证
+@app.route("/hk4e_cn/mdk/shield/api/actionTicket",methods=['POST'])
+def relNameVerify():
+    return
+
