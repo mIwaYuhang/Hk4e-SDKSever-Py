@@ -6,7 +6,7 @@
     "secret_key": "cokeserver2022"
   },
   "web": {
-    "title": "云深不知处"
+    "title": "{{%WEB_TITLE%}}"
   },
   "mail": {
     "open": false,
@@ -14,9 +14,9 @@
     "MAIL_PORT": 587,
     "MAIL_USE_TLS": true,
     "MAIL_USE_SSL": false,
-    "MAIL_USERNAME": "xxxxx@qq.com",
-    "MAIL_PASSWORD": "xxxx",
-    "MAIL_DEFAULT_SENDER": "xxxxx@qq.com"
+    "MAIL_USERNAME": "{{%EMAIL_USERNAME%}}",
+    "MAIL_PASSWORD": "{{%EMAIL_STMP_PASSWORD%}}",
+    "MAIL_DEFAULT_SENDER": "{{%EMAIL_SENDER%}}"
   },
   "dispatch": {
     "global": "http://172.10.3.5:21041",

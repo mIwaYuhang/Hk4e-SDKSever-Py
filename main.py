@@ -17,7 +17,7 @@ if __name__ == '__main__':
    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
    if sys.argv[1] == "serve":
-      print(">> Starting Flask server instance...")
+      print(">> Flask服务已启动...")
       mail_config = config.get('mail', {})
       enable_mail = mail_config.get('open', False)
 
@@ -26,8 +26,8 @@ if __name__ == '__main__':
          mail = Mail(app)
       app.run(config["app"]["listen"], config["app"]["port"])
    elif sys.argv[1] == "initdb":
-      print(">> Initializing database structure...")
+      print(">> 正在初始化数据库结构...")
       database.init_db()
-      print(">> Done!")
+      print(">> 完成!")
    else:
-      raise Exception("Unsupported operation; must be one of: serve, initdb")
+      raise Exception("未知的操作，必须是以下命令: serve, initdb")

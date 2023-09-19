@@ -5,14 +5,14 @@ import json
 
 import define
 
-# error handlers
+# 错误处理
 @app.errorhandler(404)
 def page_not_found(e):
    print(f"ErrorHandler: {e=}, {e.description}")
    return render_template('404.tmpl'), 404
 
 
-# custom json response
+# 自定义json响应
 def json_rsp(code, data):
    return Response(json.dumps({"retcode": code} | data, separators=(',', ':')), mimetype='application/json')
 
