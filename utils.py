@@ -27,11 +27,13 @@ def chunked(size, source):
 def forward_request(request, url):
    return requests.get(url, headers={"miHoYoCloudClientIP": request_ip(request)}).content
 
+# 密码保存
 def password_hash(password):
    h = hashlib.new('sha256')
    h.update(password.encode())
    return bcrypt.hashpw(h.hexdigest().encode(), bcrypt.gensalt(rounds=get_config()["security"]["bcrypt_cost"]))
 
+# 密码验证
 def password_verify(password, hashed):
    h = hashlib.new('sha256')
    h.update(password.encode())
@@ -39,10 +41,10 @@ def password_verify(password, hashed):
 
 def mask_string(text):
    if len(text) < 4:
-      return "*" * len(text) # if source is below 4 characters, mask it in entirety
+      return "*" * len(text)                          # 如果源小于4个字符，则将其全部屏蔽
    else:
-      start_pos = 2 if len(text) >= 10 else 1 # uncover either 1 or 2 first characters, depending on total length
-      end_post = 2 if len(text) > 5 else 1 # uncover 2 last characters, but only if total length is above 5
+      start_pos = 2 if len(text) >= 10 else 1         # 根据总长度，显示1或2个第一个字符
+      end_post = 2 if len(text) > 5 else 1            # 显示最后2个字符，但前提是总长度大于5个字符
       return f"{text[0:start_pos]}****{text[len(text)-end_post:]}"
 
 def mask_email(email):
