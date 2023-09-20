@@ -1,4 +1,4 @@
-# directory
+# 文件目录
 CONFIG_FILE_PATH = "./data/config.json"
 DB_PATH = "./data/sdk.db"
 SHOPWINDOW_TIERS_PATH = "./data/shopwindow/tiers.json"
@@ -7,16 +7,13 @@ MI18N_PATH = './data/mi18n'
 GACHA_SCHEDULE_PATH = './data/gacha/schedule'
 GACHA_TEXTMAP_PATH = './data/gacha/textmap'
 
-
-# account
+# 账号类型
 ACCOUNT_TYPE_GUEST = 0
 ACCOUNT_TYPE_NORMAL = 1
 
-
-# channel
+# 官服 B服
 CHANNEL_ID_MIHOYO = 1
 CHANNEL_ID_BILIBILI = 14
-
 
 # scenes
 SCENE_NORMAL = "S_NORMAL" # mobile + account; default to mobile
@@ -24,8 +21,7 @@ SCENE_ACCOUNT = "S_ACCOUNT" # mobile + account; default to account
 SCENE_USER = "S_USER" # account only
 SCENE_TEMPLE = "S_TEMPLE" # account only; no registration
 
-
-# platform
+# 客户端平台
 PLATFORM_TYPE = {
    0: "EDITOR",
    1: "IOS",
@@ -44,8 +40,7 @@ PLATFORM_TYPE = {
    14: "CLOUD_THIRD_PARTY_PC"
 }
 
-
-# response
+# 返回的状态码
 RES_SUCCESS = 0
 RES_FAIL = -1
 RES_CANCEL = -2
@@ -77,7 +72,6 @@ RES_GOOGLE_PC_TOKEN_ERROR = -1003
 
 RES_SDK_VERIFY_SUCC = 0
 RES_SDK_VERIFY_FAIL = 1
-
 
 # risky
 RISKY_ACTION_NONE = "ACTION_NONE"

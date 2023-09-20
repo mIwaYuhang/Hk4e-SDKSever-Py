@@ -1,9 +1,8 @@
 from __main__ import app
+import sqlite3
+import settings.define as define
 
 from flask import g
-import sqlite3
-
-import settings.define as define
 
 def dict_factory(cursor, row):
    d = {}

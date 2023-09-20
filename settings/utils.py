@@ -1,9 +1,9 @@
-import geoip2.database
 import requests
 import bcrypt
 import hashlib
-
+import geoip2.database
 import settings.define as define
+
 from settings.config import get_config
 
 def get_country_for_ip(ip):

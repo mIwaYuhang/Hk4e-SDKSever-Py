@@ -1,9 +1,7 @@
 from __main__ import app
-
-from flask import Response, render_template
 import json
 
-import settings.define as define
+from flask import Response, render_template
 
 # 错误处理
 @app.errorhandler(404)

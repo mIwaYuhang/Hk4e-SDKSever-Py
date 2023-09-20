@@ -1,15 +1,12 @@
 import sys
 import os
-import re
 import atexit
 import logging
 import time
-import tempfile
 import shutil
 from datetime import datetime
 from flask import Flask
 from flask_mail import Mail
-from flask_caching import Cache
 from werkzeug.serving import run_simple
 from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)

@@ -1,18 +1,17 @@
 from __main__ import app
-from flask import request, send_from_directory, abort, render_template, flash, current_app
-from flask_mail import Message
-from flask_caching import Cache
 import random
 import string
-import json
-import re
-from time import time as epoch
-from settings.response import json_rsp, json_rsp_with_msg
-from settings.database import get_db
-from settings.crypto import decrypt_rsa_password, decrypt_sdk_authkey
-from settings.utils import forward_request, request_ip, get_country_for_ip, password_hash, password_verify, mask_string, mask_email
 import settings.define as define
+
+from flask import request
+from time import time as epoch
+from flask_caching import Cache
+from settings.database import get_db
 from settings.config import get_config
+from settings.response import json_rsp_with_msg
+from settings.crypto import decrypt_rsa_password
+from settings.utils import request_ip, get_country_for_ip, password_verify, mask_string, mask_email
+
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
 def inject_config():
