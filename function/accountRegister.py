@@ -9,7 +9,7 @@ from time import time as epoch
 from flask_mail import Message
 from flask_caching import Cache
 from settings.database import get_db
-from settings.config import get_config, load_config
+from settings.config import get_config
 from settings.utils import password_hash
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app
@@ -38,7 +38,7 @@ def account_register():
             flash('邮箱已经被注册了', 'error')
         elif not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', request.form.get('email')):
             flash('邮箱格式不正确', 'error')
-        elif request.form.get('code') != cached_data and get_config()['mail']['open']:
+        elif request.form.get('verifycode') != cached_data and get_config()['mail']['open']:
             flash('验证码错误', 'error')
         elif request.form.get('password') != request.form.get('passwordv2'):
             flash('两次输入的密码不一致', 'error')
@@ -56,8 +56,8 @@ def account_register():
     return render_template("account/register.tmpl")
 
 # 邮件验证码 用于注册
-@app.route('/account/send_email', methods=['POST'])
-def send_email():
+@app.route('/account/register_code', methods=['POST'])
+def register_code():
     email = request.form.get('email')
     email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
     if not re.match(email_pattern, email):
@@ -69,7 +69,7 @@ def send_email():
         return json_rsp_with_msg(define.RES_FAIL,"邮箱已经被注册了",{})
     verification_code = ''.join(random.choices(string.digits, k=4))
     mail = current_app.extensions['mail']
-    msg = Message(f"{get_config()['web']['title']}注册验证码", recipients=[email])
+    msg = Message(f"注册验证", recipients=[email])
     msg.body = f"你的注册验证码是：{verification_code}，验证码5分钟内有效"
     try:
         mail.send(msg)
@@ -77,10 +77,3 @@ def send_email():
         return json_rsp_with_msg(define.RES_FAIL,"未知异常，请联系管理员",{})
     cache.set(email, verification_code, timeout=60*5)
     return json_rsp_with_msg(define.RES_SUCCESS,"验证码发送成功，请查收邮箱。",{})
-
-# 找回密码(功能不可用)
-@app.route('/account/recover', methods=['GET', 'POST'])
-def account_recover():
-    if request.method == 'POST':
-        flash('服务不可用', 'error')
-    return render_template("account/recover.tmpl")

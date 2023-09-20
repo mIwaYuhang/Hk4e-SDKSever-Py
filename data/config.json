@@ -13,7 +13,7 @@
     "MAIL_PORT": 587,
     "MAIL_USE_TLS": true,
     "MAIL_USE_SSL": false,
-    "MAIL_USERNAME": "{{%EMAIL_USERNAME%}}",
+    "MAIL_USERNAME": "{{%EMAIL_ADDRESS%}}",
     "MAIL_PASSWORD": "{{%EMAIL_STMP_PASSWORD%}}",
     "MAIL_DEFAULT_SENDER": "{{%EMAIL_SENDER%}}"
   },

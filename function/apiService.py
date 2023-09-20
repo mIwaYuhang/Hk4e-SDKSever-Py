@@ -3,7 +3,7 @@ import settings.define as define
 
 from flask import request
 from flask_caching import Cache
-from settings.config import get_config, load_config
+from settings.config import get_config
 from settings.response import json_rsp, json_rsp_with_msg
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})

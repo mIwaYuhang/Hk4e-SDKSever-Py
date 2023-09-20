@@ -16,7 +16,7 @@ $(document).ready(function () {
 
   function sendEmail(email) {
     $.ajax({
-      url: '/account/send_email',
+      url: '/account/register_code',
       type: 'POST',
       data: {
         email: email

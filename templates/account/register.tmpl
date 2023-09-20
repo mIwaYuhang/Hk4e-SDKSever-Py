@@ -1,20 +1,16 @@
 {% extends 'account/base.tmpl' %}
-
 {% block scripts %}
     <script src="/static/js/register.js"></script>
 {% endblock %}
-
 {% block title %}账号注册{% endblock %}
-
 {% block header %}账号注册{% endblock %}
-
 {% block content %}
   <form method="post">
     <input type="text" name="username" required placeholder="用户名">
     <input type="text" name="email" required placeholder="邮箱">
     {% if config['mail']['open'] %}
     <div class="code-box">
-      <div class="code-input"><input type="text" name="code" required placeholder="验证码" disable></div>
+      <div class="code-input"><input type="text" name="verifycode" required placeholder="验证码" disable></div>
       <div class="code-btn"><button type="button" id="sendbtn" >发送</button></div>
     </div>
     {% endif %}

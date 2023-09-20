@@ -13,13 +13,14 @@ app = Flask(__name__)
 from settings.config import load_config
 import settings.database as database
 import function.accountregister
-import function.logIn
+import function.accountrecover
+import function.loginservice
 import function.dispatch
-import function.shopWindow
+import function.rechargeservice
 import function.apiservice
 import function.accountverify
 import function.gachaservice
-import function.other
+import function.otherservice
 
 #=====================log设置=====================#
 log_dir = 'logs'
@@ -51,7 +52,7 @@ def start_flask_server(config):
     app.debug = config["app"]["debug"]
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     mail_config = config.get('mail', {})
-    enable_mail = mail_config.get('open', False)
+    enable_mail = mail_config.get('open', True)
     if enable_mail:
         app.config.update(mail_config)
         mail = Mail(app)
@@ -62,9 +63,9 @@ def start_flask_server(config):
         # use_reloader= config["app"]["reload"], # 热重载1 按照config配置文件来设置
         # use_debugger= config["app"]["debug"],
         # threaded= config["app"]["threaded"]
-        use_reloader= False,                    # 热重载2 快捷设置 方便debug
-        use_debugger=False,
-        threaded=True                           # 多线程模式 默认开启
+        use_reloader= False,                     # 热重载2 快捷设置 方便debug
+        use_debugger= False,
+        threaded= True                           # 多线程模式 默认开启
     )
 
 def initialize_database():
