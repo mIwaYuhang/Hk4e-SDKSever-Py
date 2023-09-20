@@ -1,7 +1,7 @@
 # Hk4e-SDKSever-Py
 Python-Flask实现游戏登录验证(Python版本：3.10)
 # 使用说明
-- 命令：python main.py serve / initdb
+- 命令：python main.py serve / clear
 - 代理地址：%IP_ADDRESS%:21000
 - DEBUG模式：开
 - 秘钥：cokeserver2022
