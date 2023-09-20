@@ -1,0 +1,10 @@
+#=====================未开发的功能=====================#
+# 新设备邮箱验证(路由指向/hk4e_global/mdk/shield/api/login)
+@app.route("/account/device/api/preGrantByTicket",methods=['POST'])
+def newEquipmentMailVerify():
+    return
+
+# 实名认证
+@app.route("/hk4e_cn/mdk/shield/api/actionTicket",methods=['POST'])
+def relNameVerify():
+    return
