@@ -8,6 +8,7 @@ from flask_caching import Cache
 from time import time as epoch
 from settings.response import json_rsp, json_rsp_with_msg
 from settings.database import get_db
+from settings.config import load_config
 from settings.utils import request_ip, get_country_for_ip, mask_string, mask_email
 from settings.config import get_config
 

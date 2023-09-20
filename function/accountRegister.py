@@ -9,7 +9,7 @@ from time import time as epoch
 from flask_mail import Message
 from flask_caching import Cache
 from settings.database import get_db
-from settings.config import get_config
+from settings.config import get_config, load_config
 from settings.utils import password_hash
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app
@@ -30,8 +30,12 @@ def account_register():
     if request.method == 'POST':
         user = cursor.execute("SELECT * FROM `accounts` WHERE `name` = ?",
                               (request.form.get('username'), )).fetchone()
+        email_exists = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
+                                      (request.form.get('email'), )).fetchone()
         if user:
             flash('您准备注册的用户名已被使用', 'error')
+        elif email_exists:
+            flash('邮箱已经被注册了', 'error')
         elif not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', request.form.get('email')):
             flash('邮箱格式不正确', 'error')
         elif request.form.get('code') != cached_data and get_config()['mail']['open']:
@@ -62,7 +66,7 @@ def send_email():
     user = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
                               (email, )).fetchone()
     if user:
-        return json_rsp_with_msg(define.RES_FAIL,"邮箱已被占用",{})
+        return json_rsp_with_msg(define.RES_FAIL,"邮箱已经被注册了",{})
     verification_code = ''.join(random.choices(string.digits, k=4))
     mail = current_app.extensions['mail']
     msg = Message(f"{get_config()['web']['title']}注册验证码", recipients=[email])

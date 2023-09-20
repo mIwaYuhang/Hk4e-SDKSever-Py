@@ -4,7 +4,7 @@ import settings.define as define
 
 from flask_caching import Cache
 from settings.response import json_rsp_with_msg
-from settings.config import get_config
+from settings.config import get_config, load_config
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor

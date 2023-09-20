@@ -12,13 +12,13 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 from settings.config import load_config
 import settings.database as database
-import function.accountRegister
+import function.accountregister
 import function.logIn
 import function.dispatch
 import function.shopWindow
-import function.apiService
-import function.accountVerify
-import function.gachaService
+import function.apiservice
+import function.accountverify
+import function.gachaservice
 import function.other
 
 #=====================log设置=====================#

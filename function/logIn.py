@@ -7,7 +7,7 @@ from flask import request
 from time import time as epoch
 from flask_caching import Cache
 from settings.database import get_db
-from settings.config import get_config
+from settings.config import get_config, load_config
 from settings.response import json_rsp_with_msg
 from settings.crypto import decrypt_rsa_password
 from settings.utils import request_ip, get_country_for_ip, password_verify, mask_string, mask_email

@@ -18,9 +18,9 @@
     "MAIL_DEFAULT_SENDER": "{{%EMAIL_SENDER%}}"
   },
   "dispatch": {
-    "global": "http://172.10.3.5:21041",
+    "global": "http://192.168.1.8:21041",
     "local": {
-      "dev_docker": "http://172.10.3.5:21041"
+      "dev_docker": "http://192.168.1.8:21041"
     }
   },
   "crypto": {
