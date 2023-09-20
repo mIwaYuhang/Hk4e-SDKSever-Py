@@ -5,8 +5,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 import sys
 
-from config import load_config
-import database
+from settings.config import load_config
+import settings.database as database
 import routes
 
 if __name__ == '__main__':

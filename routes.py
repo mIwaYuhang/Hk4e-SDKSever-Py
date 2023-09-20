@@ -7,12 +7,12 @@ import string
 import json
 import re
 from time import time as epoch
-from response import json_rsp, json_rsp_with_msg
-from database import get_db
-from crypto import decrypt_rsa_password, decrypt_sdk_authkey
-from utils import forward_request, request_ip, get_country_for_ip, password_hash, password_verify, mask_string, mask_email
-import define
-from config import get_config
+from settings.response import json_rsp, json_rsp_with_msg
+from settings.database import get_db
+from settings.crypto import decrypt_rsa_password, decrypt_sdk_authkey
+from settings.utils import forward_request, request_ip, get_country_for_ip, password_hash, password_verify, mask_string, mask_email
+import settings.define as define
+from settings.config import get_config
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
 def inject_config():
@@ -69,6 +69,7 @@ def query_cur_region(name):
 #=====================用户注册模块=====================#
 # 游戏账号注册
 @app.route('/account/register', methods=['GET', 'POST'])
+@app.route('/mihoyo/common/accountSystemSandboxFE/index.html', methods=['GET', 'POST'])         # 国内沙箱 注册和找回URL是同一个
 def account_register():
     cursor = get_db().cursor()
     cached_data = cache.get(request.form.get('email'))
@@ -335,9 +336,9 @@ def account_risky_api_check():
 def combo_granter_login_verify():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "is_guardian_required": False,
-            "is_heartbeat_required": False,
-            "is_realname_required": False
+            "is_guardian_required": False,      # 未满14周岁阻止登录
+            "is_heartbeat_required": True,
+            "is_realname_required": False       # 实名认证请求
         }
     })
 
@@ -511,7 +512,12 @@ def device_fp_get_ext_list():
             "pkg_list": None
         }
     })
-    
+
+# 抓出来的我也不知道是什么(国内沙箱) 似乎是玩家登录信息   
+@app.route('/hk4e_cn/combo/guard/api/ping', methods=['POST'])
+def pingResponse():
+   return json_rsp(define.RES_SUCCESS, {})
+
 #=====================未开发的功能=====================#
 # 新设备邮箱验证(路由指向/hk4e_global/mdk/shield/api/login)
 @app.route("/account/device/api/preGrantByTicket",methods=['POST'])

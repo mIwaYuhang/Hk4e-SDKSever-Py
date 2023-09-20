@@ -3,8 +3,8 @@ import requests
 import bcrypt
 import hashlib
 
-import define
-from config import get_config
+import settings.define as define
+from settings.config import get_config
 
 def get_country_for_ip(ip):
    with geoip2.database.Reader(define.GEOIP2_DB_PATH) as reader:

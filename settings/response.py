@@ -3,7 +3,7 @@ from __main__ import app
 from flask import Response, render_template
 import json
 
-import define
+import settings.define as define
 
 # 错误处理
 @app.errorhandler(404)

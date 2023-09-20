@@ -1,7 +1,7 @@
 from flask import g
 import json
 
-import define
+import settings.define as define
 
 
 def load_config():

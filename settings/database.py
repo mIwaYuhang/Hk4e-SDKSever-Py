@@ -3,7 +3,7 @@ from __main__ import app
 from flask import g
 import sqlite3
 
-import define
+import settings.define as define
 
 def dict_factory(cursor, row):
    d = {}

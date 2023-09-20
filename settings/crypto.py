@@ -1,8 +1,8 @@
 import rsa
 from base64 import b64encode, b64decode
 
-from config import get_config
-import utils
+from settings.config import get_config
+import settings.utils as utils
 
 def decrypt_sdk_authkey(version, message):
    return rsa.decrypt(b64decode(message), rsa.PublicKey.load_pkcs1(get_config()["crypto"]["rsa"]["authkey"][version])).decode()
