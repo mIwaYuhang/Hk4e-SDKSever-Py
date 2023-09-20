@@ -69,7 +69,7 @@ def start_flask_server(config):
     )
 
 def initialize_database():
-    print(">> 正在初始化数据库结构...")
+    print(">> 正在初始化数据库结构(清空数据)...")
     database.init_db()
     print(">> 完成!")
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     if command == "serve":
         print(">> Flask服务已启动...")
         start_flask_server(config)
-    elif command == "initdb":
+    elif command == "clear":
         initialize_database()
     else:
-        raise Exception("未知的操作，必须是以下命令: serve, initdb")
+        raise Exception("未知的操作，必须是以下命令: serve, clear")

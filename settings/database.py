@@ -20,8 +20,15 @@ def get_db():
 def init_db():
    conn = sqlite3.connect(define.DB_PATH)
    cursor = conn.cursor()
-
-   cursor.execute("""CREATE TABLE `accounts` (
+   
+   cursor.execute("DROP TABLE IF EXISTS `accounts`")
+   cursor.execute("DROP TABLE IF EXISTS `accounts_tokens`")
+   cursor.execute("DROP TABLE IF EXISTS `accounts_guests`")
+   cursor.execute("DROP TABLE IF EXISTS `accounts_thirdparty`")
+   cursor.execute("DROP TABLE IF EXISTS `thirdparty_tokens`")
+   cursor.execute("DROP TABLE IF EXISTS `combo_tokens`")
+   
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
                      `uid` INTEGER NOT NULL,
                      `name`  TEXT UNIQUE,
                      `email` TEXT UNIQUE,
@@ -31,7 +38,7 @@ def init_db():
                      PRIMARY KEY(`uid` AUTOINCREMENT)
                   )
    """)
-   cursor.execute("""CREATE TABLE `accounts_tokens` (
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_tokens` (
                      `uid` INTEGER NOT NULL,
                      `token` TEXT NOT NULL,
                      `device`  TEXT NOT NULL,
@@ -40,13 +47,13 @@ def init_db():
                      PRIMARY KEY(`uid`,`token`)
                   )
    """)
-   cursor.execute("""CREATE TABLE `accounts_guests` (
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_guests` (
                      `uid` INTEGER NOT NULL,
                      `device` TEXT NOT NULL,
                      PRIMARY KEY(`uid`,`device`)
                   )
    """)
-   cursor.execute("""CREATE TABLE `accounts_thirdparty` (
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_thirdparty` (
                      `uid` INTEGER NOT NULL,
                      `type`  INTEGER NOT NULL,
                      `external_name` TEXT NOT NULL,
@@ -54,13 +61,13 @@ def init_db():
                      PRIMARY KEY(`uid`,`type`)
                   )
    """)
-   cursor.execute("""CREATE TABLE `thirdparty_tokens` (
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `thirdparty_tokens` (
                      `uid` INTEGER NOT NULL,
                      `type`  INTEGER NOT NULL,
                      `token` TEXT NOT NULL
                   )
    """)
-   cursor.execute("""CREATE TABLE `combo_tokens` (
+   cursor.execute("""CREATE TABLE IF NOT EXISTS `combo_tokens` (
                      `uid` INTEGER NOT NULL,
                      `token` TEXT NOT NULL,
                      `device`  TEXT NOT NULL,

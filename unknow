@@ -8,3 +8,6 @@ def newEquipmentMailVerify():
 @app.route("/hk4e_cn/mdk/shield/api/actionTicket",methods=['POST'])
 def relNameVerify():
     return
+
+# 海外沙箱
+@app.route("/hk4e_global/combo/guard/api/ping2",methods=['POST'])
