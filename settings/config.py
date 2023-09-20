@@ -2,7 +2,6 @@ import json
 import settings.define as define
 
 from flask import g
-from settings.config import load_config
 
 def load_config():
     with open(define.CONFIG_FILE_PATH, encoding='utf-8') as file:
