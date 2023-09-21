@@ -114,7 +114,7 @@ def combo_granter_login_v2_login():
             "data": {
                 "account_type": user["type"],
                 "data": json.dumps({"guest": True if data["guest"] else False}, separators=(',', ':')),
-                "fatigue_remind": None,             # 国区专属 如果游戏时间过长，游戏内会显示提醒
+                "fatigue_remind": None,                                                    # 国区专属 如果游戏时间过长，游戏内会显示提醒
                 "heartbeat": get_config()["Player"]["heartbeat_required"],                 # 国区专属 强制游戏发送心跳包 服务器可以强制游戏时间
                 "open_id": data["uid"],
                 "combo_token": combo_token
@@ -136,7 +136,7 @@ def mdk_shield_api_verify():
         if not token:
             return json_rsp_with_msg(define.RES_LOGIN_FAILED, "游戏账号信息缓存错误", {})
         if token["device"] != request.headers.get('x-rpc-device_id'):
-            return json_rsp_with_msg(define.RES_LOGIN_FAILED, "游戏账号信息缓存错误", {})
+            return json_rsp_with_msg(define.RES_LOGIN_FAILED, "登录态失效，请重新登录", {})
         user = cursor.execute("SELECT * FROM `accounts` WHERE `uid` = ? AND `type` = ?",
                               (token["uid"], define.ACCOUNT_TYPE_NORMAL)).fetchone()
         if not user:

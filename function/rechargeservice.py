@@ -1,9 +1,11 @@
 from __main__ import app
 import json
+import os
+
+from flask import send_file
 import settings.define as define
 
 from flask_caching import Cache
-from settings.response import json_rsp_with_msg
 from settings.config import get_config
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -14,16 +16,23 @@ def inject_config():
 
 #=====================支付模块=====================#
 # 支付窗口-美元(我怎么没抓到过这个？)
-@app.route('/hk4e_cn/mdk/shopwindow/shopwindow/listPriceTier', methods=['POST'])
-@app.route('/hk4e_global/mdk/shopwindow/shopwindow/listPriceTier', methods=['POST'])
+@app.route('/hk4e_cn/mdk/shopwindow/shopwindow/listPriceTier', methods = ['POST'])
+@app.route('/hk4e_cn/mdk/shopwindow/shopwindow/listPriceTierV2', methods = ['POST'])
+@app.route('/hk4e_global/mdk/shopwindow/shopwindow/listPriceTier', methods = ['POST'])
+@app.route('/hk4e_global/mdk/shopwindow/shopwindow/listPriceTierV2', methods = ['POST'])
 def price_tier_serve():
-    f = open(define.SHOPWINDOW_TIERS_PATH)
-    tiers = json.load(f)
-    f.close()
-    currency = 'USD'
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
-        "data": {
-            "suggest_currency": currency,
-            "tiers": tiers[currency]
-        }
-    })
+    file_path = define.SHOPWINDOW_TIERS_PATH
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"
+
+# 支付方式
+@app.route('/hk4e_cn/mdk/tally/tally/listPayPlat', methods = ['POST'])
+@app.route('/hk4e_global/mdk/tally/tally/listPayPlat', methods = ['POST'])
+def price_pay_types_serve():
+    file_path = define.SHOPWINDOW_PAY_TYPES_PATH
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"

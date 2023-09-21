@@ -31,6 +31,7 @@ def abtest_config_experiment_list():
 #=====================状态收集=====================#
 # log收集
 @app.route('/log', methods=['POST'])
+@app.route('/h5/upload',methods=['POST'])
 @app.route('/log/sdk/upload', methods=['POST'])
 @app.route('/crash/dataUpload', methods=['POST'])
 @app.route('/client/event/dataUpload', methods = ['POST'])

@@ -21,6 +21,7 @@ import function.apiservice
 import function.accountverify
 import function.gachaservice
 import function.otherservice
+import function.announcement
 
 #=====================log设置=====================#
 log_dir = 'logs'

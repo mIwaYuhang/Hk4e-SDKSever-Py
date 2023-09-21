@@ -26,6 +26,10 @@ Player:
   guardian_required: false              # 需要家长验证
   realname_required: false              # 需要实名验证
   heartbeat_required: false             # 发送心跳包
+Announce:
+  remind: true                          # 登入游戏公告提醒
+  alert: true                           # 游戏内弹窗公告
+  extra_remind: true                    # 额外提醒
 Security:
   bcrypt_cost: 12
   token_length: 32

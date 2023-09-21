@@ -3,7 +3,7 @@ import random
 import string
 import settings.define as define
 
-from flask import flash, request
+from flask import request
 from time import time as epoch
 from flask_caching import Cache
 from settings.database import get_db

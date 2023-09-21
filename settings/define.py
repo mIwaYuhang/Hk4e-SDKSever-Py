@@ -2,12 +2,25 @@
 DB_PATH = "./data/sdk.db"
 MI18N_PATH = './data/mi18n'
 CONFIG_FILE_PATH = "./config.yaml"
-GACHA_TEXTMAP_PATH = './data/gacha/textmap'
-PASSWDWORD_KEY_PATH = "./data/key/password.pem"
-GACHA_SCHEDULE_PATH = './data/gacha/schedule'
 GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"
 AUTHVERIFY_KEY_PATH = "./data/key/authverify.pem"
+PASSWDWORD_KEY_PATH = "./data/key/password.pem"
+
+GACHA_TEXTMAP_PATH = './data/gacha/textmap'
+GACHA_SCHEDULE_PATH = './data/gacha/schedule'
+
 SHOPWINDOW_TIERS_PATH = "./data/shopwindow/tiers.json"
+SHOPWINDOW_PAY_TYPES_PATH = "./data/shopwindow/pay_types.json"
+
+ANNOUNCE_PATH = "./data/announce/list.json"
+ANNOUNCE_CONTENT_PATH = "./data/announce/content.json"
+ANNOUNCE_JS_PATH = "./static/js/announce/2_2e4d2779ad3d19e6406f.js"
+ANNOUNCE_CSS_PATH = "./static/css/announce/2_cb04d2d72d7555e2ab83.css"
+ANNOUNCE_FAVICON_PATH = "./static/favicon.ico"
+ANNOUNCE_MAINJS_PATH = "./static/js/announce/main.js"
+ANNOUNCE_VUEMIN_PATH = "./static/js/announce/vue.min.js"
+ANNOUNCE_MAINH5JS_PATH = "./static/js/announce/main-h5log.js"
+ANNOUNCE_FPTJS_PATH = "./static/js/announce/firebase-performance-standalone.js"
 
 # 账号类型
 ACCOUNT_TYPE_GUEST = 0
