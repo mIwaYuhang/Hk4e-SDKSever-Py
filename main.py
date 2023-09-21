@@ -56,6 +56,7 @@ def start_flask_server(config):
     if enable_mail:
         app.config.update(mail_config)
         mail = Mail(app)
+        app.extensions['mail'] = mail
     run_simple(
         config["app"]["listen"],
         config["app"]["port"],
@@ -63,7 +64,7 @@ def start_flask_server(config):
         # use_reloader= config["app"]["reload"], # 热重载1 按照config配置文件来设置
         # use_debugger= config["app"]["debug"],
         # threaded= config["app"]["threaded"]
-        use_reloader= False,                     # 热重载2 快捷设置 方便debug
+        use_reloader= True,                     # 热重载2 快捷设置 方便debug
         use_debugger= False,
         threaded= True                           # 多线程模式 默认开启
     )
