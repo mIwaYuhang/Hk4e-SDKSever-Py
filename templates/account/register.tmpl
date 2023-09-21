@@ -8,7 +8,7 @@
   <form method="post">
     <input type="text" name="username" required placeholder="用户名">
     <input type="text" name="email" required placeholder="邮箱">
-    {% if config['mail']['open'] %}
+    {% if config['Mail']['ENABLE'] %}
     <div class="code-box">
       <div class="code-input"><input type="text" name="verifycode" required placeholder="验证码" disable></div>
       <div class="code-btn"><button type="button" id="sendbtn" >发送</button></div>

@@ -31,7 +31,7 @@ def forward_request(request, url):
 def password_hash(password):
    h = hashlib.new('sha256')
    h.update(password.encode())
-   return bcrypt.hashpw(h.hexdigest().encode(), bcrypt.gensalt(rounds=get_config()["security"]["bcrypt_cost"]))
+   return bcrypt.hashpw(h.hexdigest().encode(), bcrypt.gensalt(rounds=get_config()["Security"]["bcrypt_cost"]))
 
 # 密码验证
 def password_verify(password, hashed):

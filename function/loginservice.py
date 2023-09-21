@@ -3,7 +3,7 @@ import random
 import string
 import settings.define as define
 
-from flask import request
+from flask import flash, request
 from time import time as epoch
 from flask_caching import Cache
 from settings.database import get_db
@@ -32,7 +32,7 @@ def mdk_shield_api_login():
             return json_rsp_with_msg(define.RES_FAIL, "缺少登录凭据", {})
         if not user:
             return json_rsp_with_msg(define.RES_LOGIN_FAILED, "该账号未注册", {})
-        if get_config()["auth"]["enable_password_verify"]:
+        if get_config()["Auth"]["enable_password_verify"]:
             if request.json["is_crypto"] == True:
                 password = decrypt_rsa_password(request.json["password"])
             else:
@@ -40,7 +40,7 @@ def mdk_shield_api_login():
             if not password_verify(password, user["password"]):
                 return json_rsp_with_msg(define.RES_LOGIN_FAILED, "用户名或密码不正确", {})
         token = ''.join(random.choice(string.ascii_letters)
-                        for i in range(get_config()["security"]["token_length"]))
+                        for i in range(get_config()["Security"]["token_length"]))
         cursor.execute(
             "INSERT INTO `accounts_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (?, ?, ?, ?, ?)",
             (user["uid"], token, request.headers.get('x-rpc-device_id'), request_ip(request), int(epoch()))
@@ -51,15 +51,15 @@ def mdk_shield_api_login():
                     "uid": user["uid"],
                     "name": mask_string(user["name"]),
                     "email": mask_email(user["email"]),
-                    "is_email_verify": False,
+                    "is_email_verify": get_config()["Login"]["email_verify"],
                     "token": token,
                     "country": get_country_for_ip(request_ip(request)) or "ZZ",
                     "area_code": None
                 },
-                "device_grant_required": False,                         # 新设备强制验证
+                "device_grant_required": get_config()["Login"]["device_grant_required"],                        # 新设备强制验证
                 "realname_operation": None,
-                "realperson_required": False,
-                "safe_mobile_required": False
+                "realperson_required": get_config()["Login"]["realperson_required"],
+                "safe_mobile_required": get_config()["Login"]["safe_mobile_required"]
             }
         })
     except Exception as err:
@@ -72,7 +72,7 @@ def mdk_shield_api_login():
 @app.route('/hk4e_global/mdk/guest/guest/login', methods=['POST'])
 @app.route('/hk4e_global/mdk/guest/guest/v2/login', methods=['POST'])
 def mdk_guest_login():
-    if not get_config()["auth"]["enable_server_guest"]:
+    if not get_config()["Auth"]["enable_guest"]:
         return json_rsp_with_msg(define.RES_LOGIN_CANCEL, "访客模式已关闭", {})
     try:
         cursor = get_db().cursor()

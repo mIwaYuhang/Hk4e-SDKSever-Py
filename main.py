@@ -48,22 +48,22 @@ atexit.register(rename_log_file)
 
 #=====================Falsk(main)=====================#
 def start_flask_server(config):
-    app.secret_key = config["app"]["secret_key"]
-    app.debug = config["app"]["debug"]
+    app.secret_key = config["Setting"]["secret_key"]
+    app.debug = config["Setting"]["debug"]
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-    mail_config = config.get('mail', {})
-    enable_mail = mail_config.get('open', True)
+    mail_config = config.get('Mail', {})
+    enable_mail = mail_config.get('ENABLE', True)
     if enable_mail:
         app.config.update(mail_config)
         mail = Mail(app)
-        app.extensions['mail'] = mail
+        app.extensions['Mail'] = mail
     run_simple(
-        config["app"]["listen"],
-        config["app"]["port"],
+        config["Setting"]["listen"],
+        config["Setting"]["port"],
         app,
-        # use_reloader= config["app"]["reload"], # 热重载1 按照config配置文件来设置
-        # use_debugger= config["app"]["debug"],
-        # threaded= config["app"]["threaded"]
+        # use_reloader= config["Setting"]["reload"], # 热重载1 按照config配置文件来设置
+        # use_debugger= config["Setting"]["debug"],
+        # threaded= config["Setting"]["threaded"]
         use_reloader= True,                     # 热重载2 快捷设置 方便debug
         use_debugger= False,
         threaded= True                           # 多线程模式 默认开启

@@ -19,10 +19,10 @@ def inject_config():
 def combo_granter_api_config():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "disable_ysdk_guard": True,  
-            "enable_announce_pic_popup": False,  
-            "protocol": False,  
-            "qr_enabled": False
+            "disable_ysdk_guard": get_config()["Player"]["disable_ysdk_guard"],  
+            "enable_announce_pic_popup": get_config()["Player"]["enable_announce_pic_popup"],  
+            "protocol": get_config()["Player"]["protocol"],  
+            "qr_enabled": get_config()["Player"]["qr_enabled"]
         }
     })
 
@@ -36,13 +36,13 @@ def mdk_shield_api_loadConfig():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
             "client": client,
-            "disable_mmt": True,                    # 禁用验证码
-            "disable_regist": False,                # 禁止注册
-            "enable_email_captcha": False,          # 启用邮箱验证
-            "enable_ps_bind_account": False,        # 启用与PS平台相关联
+            "disable_mmt": get_config()["Login"]["disable_mmt"],                            # 禁用验证码
+            "disable_regist": get_config()["Login"]["disable_regist"],                      # 禁止注册
+            "enable_email_captcha": get_config()["Login"]["enable_email_captcha"],          # 启用邮箱验证
+            "enable_ps_bind_account": get_config()["Login"]["enable_ps_bind_account"],      # 启用与PS平台相关联
             "game_key": request.args.get('game_key'),
-            "guest": get_config()["auth"]["enable_server_guest"],
-            "server_guest": get_config()["auth"]["enable_server_guest"],
+            "guest": get_config()["Auth"]["enable_guest"],
+            "server_guest": get_config()["Auth"]["enable_guest"],
             "identity": "I_IDENTITY",
             "name": "原神海外",
             "scene": define.SCENE_USER,
@@ -66,7 +66,7 @@ def mdk_agreement_api_get():
 def combo_granter_api_protocol():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "modified": False,
+            "modified": get_config()["Other"]["modified"],
             "protocol": {}
         }
     })
@@ -76,8 +76,8 @@ def combo_granter_api_protocol():
 def combo_box_api_config_sdk_combo():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "disable_email_bind_skip": False,  
-            "email_bind_remind": False  
+            "disable_email_bind_skip": get_config()["Login"]["disable_email_bind_skip"], 
+            "email_bind_remind": get_config()["Login"]["email_bind_remind"],  
         }
     })
 
@@ -97,7 +97,7 @@ def combo_box_api_config_sw_precache():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
             "vals": {
-                "enable": False         # 是否加载ServiceWorker进行分析
+                "enable": get_config()["Other"]["serviceworker"]         # 是否加载ServiceWorker进行分析
             }
         }
     })

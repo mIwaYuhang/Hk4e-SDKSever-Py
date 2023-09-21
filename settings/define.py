@@ -1,11 +1,13 @@
 # 文件目录
-CONFIG_FILE_PATH = "./data/config.json"
 DB_PATH = "./data/sdk.db"
-SHOPWINDOW_TIERS_PATH = "./data/shopwindow/tiers.json"
-GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"
 MI18N_PATH = './data/mi18n'
-GACHA_SCHEDULE_PATH = './data/gacha/schedule'
+CONFIG_FILE_PATH = "./config.yaml"
 GACHA_TEXTMAP_PATH = './data/gacha/textmap'
+PASSWDWORD_KEY_PATH = "./data/key/password.pem"
+GACHA_SCHEDULE_PATH = './data/gacha/schedule'
+GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"
+AUTHVERIFY_KEY_PATH = "./data/key/authverify.pem"
+SHOPWINDOW_TIERS_PATH = "./data/shopwindow/tiers.json"
 
 # 账号类型
 ACCOUNT_TYPE_GUEST = 0

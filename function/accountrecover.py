@@ -31,13 +31,13 @@ def account_recover():
             flash('邮箱格式不正确', 'error')
         elif not email_exists:
             flash('该邮箱不存在', 'error')
-        elif request.form.get('verifycode') != cached_data and get_config()['mail']['open']:
+        elif request.form.get('verifycode') != cached_data and get_config()['Mail']['ENABLE']:
             flash('验证码错误', 'error')
         elif request.form.get('password') != request.form.get('passwordv2'):
             flash('两次输入的密码不一致', 'error')
-        elif len(request.form.get('password')) < get_config()["security"]["min_password_len"]:
+        elif len(request.form.get('password')) < get_config()["Security"]["min_password_len"]:
             flash(
-                f"密码长度不能小于 {get_config()['security']['min_password_len']} 字节", 'error')
+                f"密码长度不能小于 {get_config()['Security']['min_password_len']} 字节", 'error')
         else:
             new_password = password_hash(request.form.get('password'))
             cursor.execute(

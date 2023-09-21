@@ -15,7 +15,7 @@ def inject_config():
 @app.route('/query_region_list', methods=['GET'])
 def query_region_list():
     try:
-        return forward_request(request, f"{get_config()['dispatch']['global']}/query_region_list?{request.query_string.decode()}")
+        return forward_request(request, f"{get_config()['Dispatch']['global']}/query_region_list?{request.query_string.decode()}")
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=} while forwarding request")
         abort(500)
@@ -24,7 +24,7 @@ def query_region_list():
 @app.route('/query_region/<name>', methods=['GET'])
 def query_cur_region(name):
     try:
-        return forward_request(request, f"{get_config()['dispatch']['local'][name]}/query_cur_region?{request.query_string.decode()}")
+        return forward_request(request, f"{get_config()['Dispatch']['local'][name]}/query_cur_region?{request.query_string.decode()}")
     except KeyError:
         print(f"未知的region={name}")
         abort(404)

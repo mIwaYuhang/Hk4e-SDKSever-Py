@@ -8,7 +8,6 @@ from flask_caching import Cache
 from time import time as epoch
 from settings.response import json_rsp, json_rsp_with_msg
 from settings.database import get_db
-from settings.config import load_config
 from settings.utils import request_ip, get_country_for_ip, mask_string, mask_email
 from settings.config import get_config
 
@@ -67,9 +66,9 @@ def account_risky_api_check():
 def combo_granter_login_verify():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "is_guardian_required": False,      # 未满14周岁阻止登录
-            "is_heartbeat_required": True,
-            "is_realname_required": False       # 实名认证请求
+            "is_guardian_required": get_config()["Player"]["guardian_required"],      # 未满14周岁阻止登录
+            "is_heartbeat_required": get_config()["Player"]["heartbeat_required"],
+            "is_realname_required": get_config()["Player"]["realname_required"]       # 实名认证请求
         }
     })
 
@@ -105,7 +104,7 @@ def combo_granter_login_v2_login():
                     f"Found valid account_token={token['token']} for uid={token['uid']}, but no such account exists")
                 return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})
         combo_token = ''.join(random.choice('0123456789abcdef')
-                              for i in range(get_config()["security"]["token_length"]))
+                              for i in range(get_config()["Security"]["token_length"]))
         cursor.execute(
             "INSERT OR REPLACE INTO `combo_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (?, ?, ?, ?, ?)",
             (user["uid"], combo_token, request.json["device"],
@@ -116,7 +115,7 @@ def combo_granter_login_v2_login():
                 "account_type": user["type"],
                 "data": json.dumps({"guest": True if data["guest"] else False}, separators=(',', ':')),
                 "fatigue_remind": None,             # 国区专属 如果游戏时间过长，游戏内会显示提醒
-                "heartbeat": False,                 # 国区专属 强制游戏发送心跳包 服务器可以强制游戏时间
+                "heartbeat": get_config()["Player"]["heartbeat_required"],                 # 国区专属 强制游戏发送心跳包 服务器可以强制游戏时间
                 "open_id": data["uid"],
                 "combo_token": combo_token
             }
