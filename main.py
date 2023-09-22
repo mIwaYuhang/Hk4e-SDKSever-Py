@@ -4,6 +4,8 @@ import atexit
 import logging
 import time
 import shutil
+import codecs
+
 from datetime import datetime
 import settings.define as define
 from flask import Flask, request
@@ -26,6 +28,7 @@ import function.accountverify
 import function.gachaservice
 import function.otherservice
 import function.announcement
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
 # =====================log设置===================== #
 log_dir = 'logs'
@@ -53,7 +56,7 @@ atexit.register(rename_log_file)
 
 # 加载配置文件
 def load_config():
-    with open(define.CONFIG_FILE_PATH, 'r') as f:
+    with open(define.CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
     return config
 
@@ -67,7 +70,8 @@ def log_request_content():
     enable_request_logging = get_request_logging_config()
     if enable_request_logging:
         content = request.get_data(as_text=True)
-        logging.info(f"客户端上报: {content}")
+        encoded_content = content.encode('utf-8')
+        logging.info(f"ClientReport: {encoded_content}")
 
 # =====================Falsk(main)===================== #
 def start_flask_server(config):
