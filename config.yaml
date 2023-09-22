@@ -6,7 +6,7 @@ Setting:
   reload: false
   debug: false
   threaded: true
-  high_frequency_logs: true             # sdk是否启用高频日志
+  high_frequency_logs: false            # sdk是否启用高频日志
   secret_key: "cokeserver2022"
 Login:
   disable_mmt: true                     # 禁用验证码
@@ -32,7 +32,7 @@ Player:
   realname_required: false              # 需要实名验证
   heartbeat_required: true              # 发送心跳包
 # Reddot:
-  # display: false                        # 游戏内是否显示红点
+  # display: false                      # 游戏内是否显示红点
 Announce:
   remind: true                          # 登入游戏公告提醒
   alert: true                           # 游戏内弹窗公告

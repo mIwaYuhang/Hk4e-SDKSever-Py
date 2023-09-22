@@ -53,7 +53,7 @@ def mdk_shield_api_login():
                     "email": mask_email(user["email"]),
                     "is_email_verify": get_config()["Login"]["email_verify"],
                     "token": token,
-                    "country": get_country_for_ip(request_ip(request)) or "ZZ",
+                    "country": get_country_for_ip(request_ip(request)) or "CN",
                     "area_code": None
                 },
                 "device_grant_required": get_config()["Login"]["device_grant_required"],                        # 新设备强制验证
