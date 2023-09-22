@@ -112,9 +112,14 @@ def combo_granter_login_v2_login():
         )
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
+                "combo_id":0,
                 "account_type": user["type"],
                 "data": json.dumps({"guest": True if data["guest"] else False}, separators=(',', ':')),
-                "fatigue_remind": None,                                                    # 国区专属 如果游戏时间过长，游戏内会显示提醒
+                "fatigue_remind": {
+                    "nickname":"旅行者",
+                    "reset_point":14400,
+                    "durations":[180,240,300]
+                },                                                                         # 国区专属 如果游戏时间过长，游戏内会显示提醒
                 "heartbeat": get_config()["Player"]["heartbeat_required"],                 # 国区专属 强制游戏发送心跳包 服务器可以强制游戏时间
                 "open_id": data["uid"],
                 "combo_token": combo_token

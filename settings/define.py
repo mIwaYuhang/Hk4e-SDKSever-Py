@@ -30,11 +30,11 @@ ACCOUNT_TYPE_NORMAL = 1
 CHANNEL_ID_MIHOYO = 1
 CHANNEL_ID_BILIBILI = 14
 
-# scenes
-SCENE_NORMAL = "S_NORMAL" # mobile + account; default to mobile
-SCENE_ACCOUNT = "S_ACCOUNT" # mobile + account; default to account
-SCENE_USER = "S_USER" # account only
-SCENE_TEMPLE = "S_TEMPLE" # account only; no registration
+# 登录场景
+SCENE_NORMAL = "S_NORMAL"        # 手机号+用户名 默认手机号
+SCENE_ACCOUNT = "S_ACCOUNT"      # 手机号+用户名 默认用户名
+SCENE_USER = "S_USER"            # 仅账号
+SCENE_TEMPLE = "S_TEMPLE"        # 仅账号 无需注册
 
 # 客户端平台
 PLATFORM_TYPE = {

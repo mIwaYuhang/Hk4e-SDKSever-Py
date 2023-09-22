@@ -1,0 +1,70 @@
+# SDKServer-config
+# Main
+Setting:
+  listen: "0.0.0.0"
+  port: 21000
+  reload: false
+  debug: false
+  threaded: false
+  secret_key: "cokeserver2022"
+Login:
+  disable_mmt: false                     # 禁用验证码
+  disable_regist: false                  # 禁用注册功能
+  disable_email_bind_skip: false         # 禁用跳过电子邮件绑定
+  enable_email_captcha: false            # 启用电子邮件验证码
+  enable_ps_bind_account: false          # 启用账号绑定功能
+  email_bind_remind: false               # 启用电子邮件绑定提醒
+  email_verify: false                    # 启用电子邮件验证
+  realperson_required: false             # 需要真实身份验证
+  safe_mobile_required: false            # 需要安全手机验证
+  device_grant_required: false           # 新设备登录验证
+  initialize_firebase: false             # 是否初始化Firebase(用户认证、实时数据库、云存储等)
+  bbs_auth_login: false                  # BBS 认证登录
+  fetch_instance_id: false               # 登录时获取设备ID
+  enable_flash_login: false              # 闪电登录
+Player:
+  disable_ysdk_guard: false              # 禁用游戏防沉迷系统
+  enable_announce_pic_popup: false       # 启用弹窗
+  protocol: false                        # 启用协议
+  qr_enabled: false                      # 启用二维码功能
+  guardian_required: false               # 需要家长验证
+  realname_required: false               # 需要实名验证
+  heartbeat_required: false              # 发送心跳包
+Reddot:
+  display: false                         # 游戏内是否显示红点
+Announce:
+  remind: false                          # 登入游戏公告提醒
+  alert: false                           # 游戏内弹窗公告
+  extra_remind: false                    # 额外提醒
+Security:
+  bcrypt_cost: 12
+  token_length: 32
+  min_password_len: 8 
+Auth:
+  enable_password_verify: false          # 启用密码验证
+  enable_guest: false                    # 启用游客登录
+Other:
+  modified: false                        # 追踪对象或实体的变更状态或时间
+  serviceworker: false                   # 启用分析
+
+# Global Settings
+Dispatch:
+  global: "http://172.10.3.5:21041"
+  local:
+    dev_docker: "http://172.10.3.5:21041"
+Crypto:
+  rsa:
+    password: "./data/key/passwdword.pem"
+    authkey:  "./data/key/authverify.pem"
+    version:  1
+
+# Accountmanage
+Mail:
+  ENABLE: false
+  MAIL_SERVER: "smtp.qq.com"
+  MAIL_PORT: 587
+  MAIL_USE_TLS: false
+  MAIL_USE_SSL: false
+  MAIL_USERNAME: "{{%EMAIL_ADDRESS%}}"
+  MAIL_PASSWORD: "{{%EMAIL_STMP_PASSWORD%}}"
+  MAIL_DEFAULT_SENDER: "{{%EMAIL_SENDER%}}"
