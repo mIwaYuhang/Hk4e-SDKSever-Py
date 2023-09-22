@@ -12,6 +12,15 @@ def inject_config():
     config = get_config()
     return {'config': config}
 
+def json_rsp(code, message, data=None):
+    response = {
+        "code": code,
+        "message": message
+    }
+    if data is not None:
+        response["data"] = data
+    return response
+
 #=====================Api功能=====================#
 # Api-Config(https://sandbox-sdk-os.hoyoverse.com)
 @app.route('/hk4e_cn/combo/granter/api/getConfig', methods=['GET'])
@@ -94,17 +103,21 @@ def combo_box_api_config_sdk_combo():
 @app.route('/hk4e_cn/combo/red_dot/list', methods=['POST'])
 @app.route('/hk4e_global/combo/red_dot/list', methods=['POST'])
 def red_dot():
-    return json_rsp(define.RES_SUCCESS, "ok",{
-        "data":{
-            "infos":[
-                {
-                    "red_point_type":2201,              # 基于玩家的动态设置
-                    "content_id":184,
-                    "display":get_config()["Reddot"]["display"]
-                }
-            ]
-        }
+    return json_rsp(define.RES_SUCCESS, "ok", {
+        "infos": []
     })
+"""
+def red_dot():
+    return json_rsp(define.RES_SUCCESS, "ok", {
+        "infos": [
+            {
+                "red_point_type": 2201,
+                "content_id": 184,
+                "display": get_config()["Reddot"]["display"]
+            }
+        ]
+    })
+"""
 
 # 预加载
 @app.route('/combo/box/api/config/sw/precache', methods=['GET'])

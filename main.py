@@ -5,11 +5,15 @@ import logging
 import time
 import shutil
 from datetime import datetime
-from flask import Flask
+import settings.define as define
+from flask import Flask, request
 from flask_mail import Mail
 from werkzeug.serving import run_simple
 from werkzeug.middleware.proxy_fix import ProxyFix
+import yaml
+
 app = Flask(__name__)
+
 from settings.config import load_config
 import settings.database as database
 import function.accountregister
@@ -23,7 +27,7 @@ import function.gachaservice
 import function.otherservice
 import function.announcement
 
-#=====================log设置=====================#
+# =====================log设置===================== #
 log_dir = 'logs'
 os.makedirs(log_dir, exist_ok=True)
 log_file = os.path.join(log_dir, 'sdkserver-running.log')
@@ -47,7 +51,25 @@ def rename_log_file():
     shutil.move(log_file, new_log_file)
 atexit.register(rename_log_file)
 
-#=====================Falsk(main)=====================#
+# 加载配置文件
+def load_config():
+    with open(define.CONFIG_FILE_PATH, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
+# 获取请求日志记录配置项
+def get_request_logging_config():
+    config = load_config()
+    return config.get('Setting', {}).get('high_frequency_logs', False)
+
+@app.before_request
+def log_request_content():
+    enable_request_logging = get_request_logging_config()
+    if enable_request_logging:
+        content = request.get_data(as_text=True)
+        logging.info(f"客户端上报: {content}")
+
+# =====================Falsk(main)===================== #
 def start_flask_server(config):
     app.secret_key = config["Setting"]["secret_key"]
     app.debug = config["Setting"]["debug"]
@@ -65,9 +87,9 @@ def start_flask_server(config):
         # use_reloader= config["Setting"]["reload"], # 热重载1 按照config配置文件来设置
         # use_debugger= config["Setting"]["debug"],
         # threaded= config["Setting"]["threaded"]
-        use_reloader= True,                     # 热重载2 快捷设置 方便debug
-        use_debugger= False,
-        threaded= True                           # 多线程模式 默认开启
+        use_reloader=True,                     # 热重载2 快捷设置 方便debug
+        use_debugger=False,
+        threaded=True                           # 多线程模式 默认开启
     )
 
 def initialize_database():
