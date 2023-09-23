@@ -1,5 +1,4 @@
 # 文件目录
-DB_PATH = "./data/sdk.db"
 MI18N_PATH = './data/mi18n'
 CONFIG_FILE_PATH = "./config.yaml"
 GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"

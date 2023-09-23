@@ -1,88 +1,115 @@
 from __main__ import app
-import sqlite3
-import settings.define as define
-
 from flask import g
+import settings.define as define
+import pymysql
+import yaml
 
 def dict_factory(cursor, row):
-   d = {}
-   for idx, col in enumerate(cursor.description):
-      d[col[0]] = row[idx]
-   return d
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+def get_config():
+    with open(define.CONFIG_FILE_PATH, encoding='utf-8') as file:
+        config = yaml.safe_load(file)
+    return config
 
 def get_db():
-   db = getattr(g, '_database', None)
-   if db is None:
-      db = g._database = sqlite3.connect(define.DB_PATH)
-      db.row_factory = dict_factory
-   return db
+    db = getattr(g, '_database', None)
+    if db is None:
+        config = get_config()['Database']
+        db = g._database = pymysql.connect(
+            host=config['host'],
+            user=config['user'],
+            port=config['port'],
+            password=config['password'],
+            database=config['name'],
+            cursorclass=pymysql.cursors.DictCursor
+        )
+    return db
 
-def init_db():
-   conn = sqlite3.connect(define.DB_PATH)
-   cursor = conn.cursor()
-   
-   cursor.execute("DROP TABLE IF EXISTS `accounts`")
-   cursor.execute("DROP TABLE IF EXISTS `accounts_tokens`")
-   cursor.execute("DROP TABLE IF EXISTS `accounts_guests`")
-   cursor.execute("DROP TABLE IF EXISTS `accounts_thirdparty`")
-   cursor.execute("DROP TABLE IF EXISTS `thirdparty_tokens`")
-   cursor.execute("DROP TABLE IF EXISTS `combo_tokens`")
-   
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
-                     `uid` INTEGER NOT NULL,
-                     `name`  TEXT UNIQUE,
+def init_db(auto_create = get_config()['Database']['autocreate']):
+    config = get_config()['Database']
+    conn = pymysql.connect(
+        host=config['host'],
+        user=config['user'],
+        port=config['port'],
+        password=config['password'],
+        charset='utf8mb4'
+    )
+    cursor = conn.cursor()
+    if auto_create:
+        cursor.execute("CREATE DATABASE IF NOT EXISTS `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci".format(config['name']))
+    cursor.execute("USE `{}`".format(config['name']))
+    cursor.execute("DROP TABLE IF EXISTS `accounts`")
+    cursor.execute("DROP TABLE IF EXISTS `accounts_tokens`")
+    cursor.execute("DROP TABLE IF EXISTS `accounts_guests`")
+    cursor.execute("DROP TABLE IF EXISTS `accounts_thirdparty`")
+    cursor.execute("DROP TABLE IF EXISTS `thirdparty_tokens`")
+    cursor.execute("DROP TABLE IF EXISTS `combo_tokens`")
+    
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
+                     `uid` INT AUTO_INCREMENT PRIMARY KEY,
+                     `name` TEXT UNIQUE,
+                     `mobile` TEXT UNIQUE,
                      `email` TEXT UNIQUE,
-                     `password`  TEXT,
-                     `type`  INTEGER NOT NULL,
-                     `epoch_created` INTEGER NOT NULL,
-                     PRIMARY KEY(`uid` AUTOINCREMENT)
-                  )
-   """)
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_tokens` (
-                     `uid` INTEGER NOT NULL,
+                     `password` TEXT,
+                     `type` INT NOT NULL,
+                     `epoch_created` INT NOT NULL
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='玩家账号信息表'
+    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_tokens` (
+                     `uid` INT NOT NULL,
                      `token` TEXT NOT NULL,
-                     `device`  TEXT NOT NULL,
-                     `ip`  TEXT NOT NULL,
-                     `epoch_generated` INTEGER NOT NULL,
-                     PRIMARY KEY(`uid`,`token`)
-                  )
-   """)
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_guests` (
-                     `uid` INTEGER NOT NULL,
                      `device` TEXT NOT NULL,
-                     PRIMARY KEY(`uid`,`device`)
-                  )
-   """)
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_thirdparty` (
-                     `uid` INTEGER NOT NULL,
-                     `type`  INTEGER NOT NULL,
+                     `ip` TEXT NOT NULL,
+                     `epoch_generated` INT NOT NULL,
+                     PRIMARY KEY(`uid`,`token`(255))
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='账号登录token'
+    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_guests` (
+                     `uid` INT NOT NULL,
+                     `device` TEXT(255) NOT NULL,
+                     PRIMARY KEY(`uid`,`device`(255))
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='游客登录信息表'
+    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_thirdparty` (
+                     `uid` INT NOT NULL,
+                     `type` INT NOT NULL,
                      `external_name` TEXT NOT NULL,
-                     `external_id` INTEGER NOT NULL,
+                     `external_id` INT NOT NULL,
                      PRIMARY KEY(`uid`,`type`)
-                  )
-   """)
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `thirdparty_tokens` (
-                     `uid` INTEGER NOT NULL,
-                     `type`  INTEGER NOT NULL,
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='第三方账号登录信息表'
+    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `thirdparty_tokens` (
+                     `uid` INT NOT NULL,
+                     `type` INT NOT NULL,
                      `token` TEXT NOT NULL
-                  )
-   """)
-   cursor.execute("""CREATE TABLE IF NOT EXISTS `combo_tokens` (
-                     `uid` INTEGER NOT NULL,
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='第三方账号登录token'
+    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `combo_tokens` (
+                     `uid` INT NOT NULL,
                      `token` TEXT NOT NULL,
-                     `device`  TEXT NOT NULL,
-                     `ip`  TEXT NOT NULL,
-                     `epoch_generated` INTEGER NOT NULL,
+                     `device` TEXT NOT NULL,
+                     `ip` TEXT NOT NULL,
+                     `epoch_generated` INT NOT NULL,
                      PRIMARY KEY(`uid`)
-                  )
-   """)
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='设备信息token'
+    """)
 
-   conn.commit()
-   conn.close()
+    conn.commit()
+    conn.close()
 
 @app.teardown_appcontext
 def close_connection(exception):
-   db = getattr(g, '_database', None)
-   if db is not None:
-      db.commit()
-      db.close()
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.commit()
+        db.close()

@@ -19,20 +19,20 @@ def inject_config():
 
 #=====================校验模块=====================#
 # 账号校验(t_sdk_config)
-@app.route('/inner/account/verify', methods=['POST'])
 def inner_account_verify():
     try:
         data = json.loads(request.data)
         cursor = get_db().cursor()
-        token = cursor.execute("SELECT * FROM `combo_tokens` WHERE `token` = ? AND `uid` = ?",
-                               (data["combo_token"], data["open_id"])).fetchone()
+        token_query = "SELECT * FROM `combo_tokens` WHERE `token` = %s AND `uid` = %s"
+        cursor.execute(token_query, (data["combo_token"], data["open_id"]))
+        token = cursor.fetchone()
         if not token:
             return json_rsp(define.RES_SDK_VERIFY_FAIL, {})
-        user = cursor.execute(
-            "SELECT * FROM `accounts` WHERE `uid` = ?", (token["uid"], )).fetchone()
+        user_query = "SELECT * FROM `accounts` WHERE `uid` = %s"
+        cursor.execute(user_query, (token["uid"],))
+        user = cursor.fetchone()
         if not user:
-            print(
-                f"Found valid combo_token={token['token']} for uid={token['uid']}, but no such account exists")
+            print(f"Found valid combo_token={token['token']} for uid={token['uid']}, but no such account exists")
             return json_rsp(define.RES_SDK_VERIFY_FAIL, {})
         return json_rsp(define.RES_SDK_VERIFY_SUCC, {
             "data": {
@@ -40,13 +40,12 @@ def inner_account_verify():
                 "account_type": user["type"],
                 "account_uid": token["uid"],
                 "ip_info": {
-                    "country_code": get_country_for_ip(token["ip"]) or "ZZ"
+                    "country_code": get_country_for_ip(token["ip"]) or "CN"
                 }
             }
         })
     except Exception as err:
-        print(
-            f"Unexpected {err=}, {type(err)=} while handling account verify event")
+        print(f"处理账号校验事件时出现意外错误{err=}, {type(err)=}")
         return json_rsp(define.RES_SDK_VERIFY_FAIL, {})
 
 # 账号风险验证
@@ -80,54 +79,52 @@ def combo_granter_login_v2_login():
         cursor = get_db().cursor()
         data = json.loads(request.json["data"])
         if data["guest"]:
-            guest = cursor.execute("SELECT * FROM `accounts_guests` WHERE `device` = ? AND `uid` = ?",
-                                   (request.json["device"], data["uid"])).fetchone()
+            guest_query = "SELECT * FROM `accounts_guests` WHERE `device` = %s AND `uid` = %s"
+            cursor.execute(guest_query, (request.json["device"], data["uid"]))
+            guest = cursor.fetchone()
             if not guest:
                 return json_rsp_with_msg(define.RES_LOGIN_FAILED, "游戏账号信息缓存错误", {})
-
-            user = cursor.execute("SELECT * FROM `accounts` WHERE `uid` = ? AND `type` = ?",
-                                  (data["uid"], define.ACCOUNT_TYPE_GUEST)).fetchone()
+            user_query = "SELECT * FROM `accounts` WHERE `uid` = %s AND `type` = %s"
+            cursor.execute(user_query, (data["uid"], define.ACCOUNT_TYPE_GUEST))
+            user = cursor.fetchone()
             if not user:
-                print(
-                    f"Found valid account_guest={guest['uid']} for device={guest['device']}, but no such account exists")
+                print(f"Found valid account_guest={guest['uid']} for device={guest['device']}, but no such account exists")
                 return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})
         else:
-            token = cursor.execute(
-                "SELECT * FROM `accounts_tokens` WHERE `token` = ? AND `uid` = ?", (data["token"], data["uid"])).fetchone()
+            token_query = "SELECT * FROM `accounts_tokens` WHERE `token` = %s AND `uid` = %s"
+            cursor.execute(token_query, (data["token"], data["uid"]))
+            token = cursor.fetchone()
             if not token:
                 return json_rsp_with_msg(define.RES_LOGIN_FAILED, "游戏账号信息缓存错误", {})
-
-            user = cursor.execute("SELECT * FROM `accounts` WHERE `uid` = ? AND `type` = ?",
-                                  (token["uid"], define.ACCOUNT_TYPE_NORMAL)).fetchone()
+            user_query = "SELECT * FROM `accounts` WHERE `uid` = %s AND `type` = %s"
+            cursor.execute(user_query, (token["uid"], define.ACCOUNT_TYPE_NORMAL))
+            user = cursor.fetchone()
             if not user:
-                print(
-                    f"Found valid account_token={token['token']} for uid={token['uid']}, but no such account exists")
+                print(f"Found valid account_token={token['token']} for uid={token['uid']}, but no such account exists")
                 return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})
-        combo_token = ''.join(random.choice('0123456789abcdef')
-                              for i in range(get_config()["Security"]["token_length"]))
-        cursor.execute(
-            "INSERT OR REPLACE INTO `combo_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (?, ?, ?, ?, ?)",
-            (user["uid"], combo_token, request.json["device"],
-             request_ip(request), int(epoch()))
-        )
+        combo_token = ''.join(random.choices('0123456789abcdef', k=get_config()["Security"]["token_length"]))
+        device = request.json["device"]
+        ip = request_ip(request)
+        epoch_generated = int(epoch())
+        combo_token_query = "INSERT INTO `combo_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE `token` = VALUES(`token`), `device` = VALUES(`device`), `ip` = VALUES(`ip`), `epoch_generated` = VALUES(`epoch_generated`)"
+        cursor.execute(combo_token_query, (user["uid"], combo_token, device, ip, epoch_generated))
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
-                "combo_id":0,
+                "combo_id": 0,
                 "account_type": user["type"],
                 "data": json.dumps({"guest": True if data["guest"] else False}, separators=(',', ':')),
                 "fatigue_remind": {
-                    "nickname":"旅行者",
-                    "reset_point":14400,
-                    "durations":[180,240,300]
-                },                                                                         # 国区专属 如果游戏时间过长，游戏内会显示提醒
-                "heartbeat": get_config()["Player"]["heartbeat_required"],                 # 国区专属 强制游戏发送心跳包 服务器可以强制游戏时间
+                    "nickname": "旅行者",
+                    "reset_point": 14400,
+                    "durations": [180, 240, 300]
+                },
+                "heartbeat": get_config()["Player"]["heartbeat_required"],
                 "open_id": data["uid"],
                 "combo_token": combo_token
             }
         })
     except Exception as err:
-        print(
-            f"Unexpected {err=}, {type(err)=} while handling combo login event")
+        print(f"处理 combo 登录事件时出现意外错误 {err=}，{type(err)=}")
         return json_rsp_with_msg(define.RES_FAIL, "系统错误，请稍后再试", {})
 
 # 游戏账号信息缓存校验
@@ -136,17 +133,18 @@ def combo_granter_login_v2_login():
 def mdk_shield_api_verify():
     try:
         cursor = get_db().cursor()
-        token = cursor.execute("SELECT * FROM `accounts_tokens` WHERE `token` = ? AND `uid` = ?",
-                               (request.json["token"], request.json["uid"])).fetchone()
+        token_query = "SELECT * FROM `accounts_tokens` WHERE `token` = %s AND `uid` = %s"
+        cursor.execute(token_query, (request.json["token"], request.json["uid"]))
+        token = cursor.fetchone()
         if not token:
             return json_rsp_with_msg(define.RES_LOGIN_FAILED, "游戏账号信息缓存错误", {})
         if token["device"] != request.headers.get('x-rpc-device_id'):
             return json_rsp_with_msg(define.RES_LOGIN_FAILED, "登录态失效，请重新登录", {})
-        user = cursor.execute("SELECT * FROM `accounts` WHERE `uid` = ? AND `type` = ?",
-                              (token["uid"], define.ACCOUNT_TYPE_NORMAL)).fetchone()
+        user_query = "SELECT * FROM `accounts` WHERE `uid` = %s AND `type` = %s"
+        cursor.execute(user_query, (token["uid"], define.ACCOUNT_TYPE_NORMAL))
+        user = cursor.fetchone()
         if not user:
-            print(
-                f"Found valid account_token={token['token']} for uid={token['uid']}, but no such account exists")
+            print(f"Found valid account_token={token['token']} for uid={token['uid']}, but no such account exists")
             return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
@@ -154,15 +152,14 @@ def mdk_shield_api_verify():
                     "uid": user["uid"],
                     "name": mask_string(user["name"]),
                     "email": mask_email(user["email"]),
-                    "is_email_verify": False,  
-                    "token": token["token"],        # 重用token
-                    "country": get_country_for_ip(request_ip(request)) or "ZZ",
-                    "area_code": None               #如果使用GeoLite2-City，则可以填充
+                    "is_email_verify": get_config()["Login"]["email_verify"],
+                    "token": token["token"],
+                    "country": get_country_for_ip(request_ip(request)) or "CN",
+                    "area_code": None
                 }
             }
         })
     except Exception as err:
-        print(
-            f"Unexpected {err=}, {type(err)=} while handling shield verify event")
+        print(f"处理 MDK Shield API 验证时出现意外错误 {err=}，{type(err)=}")
         return json_rsp_with_msg(define.RES_FAIL, "系统错误，请稍后再试", {})
 

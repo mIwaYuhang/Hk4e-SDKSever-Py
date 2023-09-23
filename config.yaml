@@ -6,8 +6,15 @@ Setting:
   reload: false
   debug: false
   threaded: true
-  high_frequency_logs: false            # sdk是否启用高频日志
+  high_frequency_logs: true             # sdk是否启用高频日志
   secret_key: "cokeserver2022"
+Database:
+  host: 192.168.1.8
+  user: root
+  port: 3000
+  autocreate: true                      # 无库时是否自动创建 
+  name: hk4e-accounts-cokeserver
+  password: G4H8H9G4SWT8HJIIUUOI8WR4S89HDF1H151A99EQ19ES6X60G4H8RGF4S9DF1F9
 Login:
   disable_mmt: true                     # 禁用验证码
   disable_regist: false                 # 禁用注册功能
@@ -24,7 +31,7 @@ Login:
   fetch_instance_id: true               # 登录时获取设备ID
   enable_flash_login: true              # 闪电登录
 Player:
-  disable_ysdk_guard: false             # 禁用游戏防沉迷系统
+  disable_ysdk_guard: false             # 禁用游戏防沉迷系统(提醒游戏时长)
   enable_announce_pic_popup: true       # 启用弹窗
   protocol: true                        # 启用协议
   qr_enabled: false                     # 启用二维码功能

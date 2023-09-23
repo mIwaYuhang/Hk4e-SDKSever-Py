@@ -53,6 +53,31 @@ def ann_content():
 def handle_announcement():
     return render_template("announce/announcement.tmpl")
 
+# 获取字体
+@app.route('/hk4e_cn/combo/granter/api/getFont', methods = ['GET'])
+@app.route('/hk4e_global/combo/granter/api/getFont', methods = ['GET'])
+def get_font():
+   return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+      "data":{
+         "fonts":[
+            {
+               "font_id":"0",
+               "app_id":0,
+               "name":"zh-cn.ttf",
+               "url":"https://webstatic.mihoyo.com/upload/font-lib/2023/03/01/4398dec1a0ffa3d3ce99ef1424107550_4765013443347169028.ttf",
+               "md5":"4398dec1a0ffa3d3ce99ef1424107550"
+            },
+            {
+               "font_id":"0",
+               "app_id":0,
+               "name":"ja.ttf",
+               "url":"https://webstatic.mihoyo.com/upload/font-lib/2023/03/01/2c148f36573625fc03c82579abd26fb1_1167469228143141125.ttf",
+               "md5":"2c148f36573625fc03c82579abd26fb1"
+            }
+         ]
+      }
+   })
+
 # 资源文件
 @app.route('/hk4e/announcement/2_2e4d2779ad3d19e6406f.js',methods=['GET'])
 def get_js():

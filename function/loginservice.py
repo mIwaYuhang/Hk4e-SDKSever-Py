@@ -1,5 +1,6 @@
 from __main__ import app
 import random
+import re
 import string
 import settings.define as define
 
@@ -19,32 +20,39 @@ def inject_config():
     return {'config': config}
 
 #=====================登录模块=====================#
-# 玩家登录
+def validate_user_format(user):
+    phone_pattern = r'^\d{11}$'
+    email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(phone_pattern, user) is not None or re.match(email_pattern, user) is not None
+
 @app.route('/hk4e_cn/mdk/shield/api/login', methods=['POST'])
 @app.route('/hk4e_global/mdk/shield/api/login', methods=['POST'])
 def mdk_shield_api_login():
     try:
         cursor = get_db().cursor()
-        if "account" in request.json:
-            user = cursor.execute("SELECT * FROM `accounts` WHERE (`email` = ? OR `name` = ?) AND `type` = ?",
-                                  (request.json["account"], request.json["account"], define.ACCOUNT_TYPE_NORMAL)).fetchone()
-        else:
+        if "account" not in request.json:
             return json_rsp_with_msg(define.RES_FAIL, "缺少登录凭据", {})
+        account = request.json["account"]
+        email_name_query = "SELECT * FROM `accounts` WHERE (`email` = %s OR `mobile` = %s ) AND `type` = %s"
+        cursor.execute(email_name_query, (account, account, define.ACCOUNT_TYPE_NORMAL))
+        user = cursor.fetchone()
+        if not validate_user_format(account):
+            return json_rsp_with_msg(define.RES_FAIL, "错误的登录格式", {})
         if not user:
             return json_rsp_with_msg(define.RES_LOGIN_FAILED, "该账号未注册", {})
         if get_config()["Auth"]["enable_password_verify"]:
-            if request.json["is_crypto"] == True:
+            if request.json["is_crypto"]:
                 password = decrypt_rsa_password(request.json["password"])
             else:
                 password = request.json["password"]
             if not password_verify(password, user["password"]):
                 return json_rsp_with_msg(define.RES_LOGIN_FAILED, "用户名或密码不正确", {})
-        token = ''.join(random.choice(string.ascii_letters)
-                        for i in range(get_config()["Security"]["token_length"]))
-        cursor.execute(
-            "INSERT INTO `accounts_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (?, ?, ?, ?, ?)",
-            (user["uid"], token, request.headers.get('x-rpc-device_id'), request_ip(request), int(epoch()))
-        )
+        token = ''.join(random.choices(string.ascii_letters, k=get_config()["Security"]["token_length"]))
+        device_id = request.headers.get('x-rpc-device_id')
+        ip = request_ip(request)
+        epoch_generated = int(epoch())
+        insert_token_query = "INSERT INTO `accounts_tokens` (`uid`, `token`, `device`, `ip`, `epoch_generated`) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insert_token_query, (user["uid"], token, device_id, ip, epoch_generated))
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
                 "account": {
@@ -53,17 +61,17 @@ def mdk_shield_api_login():
                     "email": mask_email(user["email"]),
                     "is_email_verify": get_config()["Login"]["email_verify"],
                     "token": token,
-                    "country": get_country_for_ip(request_ip(request)) or "CN",
+                    "country": get_country_for_ip(ip) or "CN",
                     "area_code": None
                 },
-                "device_grant_required": get_config()["Login"]["device_grant_required"],                        # 新设备强制验证
+                "device_grant_required": get_config()["Login"]["device_grant_required"],
                 "realname_operation": None,
                 "realperson_required": get_config()["Login"]["realperson_required"],
                 "safe_mobile_required": get_config()["Login"]["safe_mobile_required"]
             }
         })
     except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=} while handling shield login event")
+        print(f"处理登录事件时出现意外错误 {err=}，{type(err)=}")
         return json_rsp_with_msg(define.RES_FAIL, "系统错误，请稍后再试", {})
 
 # 快速游戏
@@ -73,24 +81,25 @@ def mdk_shield_api_login():
 @app.route('/hk4e_global/mdk/guest/guest/v2/login', methods=['POST'])
 def mdk_guest_login():
     if not get_config()["Auth"]["enable_guest"]:
-        return json_rsp_with_msg(define.RES_LOGIN_CANCEL, "访客模式已关闭", {})
+        return json_rsp_with_msg(define.RES_LOGIN_CANCEL, "游客模式已关闭", {})
     try:
         cursor = get_db().cursor()
-        guest = cursor.execute(
-            "SELECT * FROM `accounts_guests` WHERE `device` = ?", (request.json["device"], )).fetchone()
+        guest_query = "SELECT * FROM `accounts_guests` WHERE `device` = %s"
+        cursor.execute(guest_query, (request.json["device"],))
+        guest = cursor.fetchone()
         if not guest:
-            cursor.execute("INSERT INTO `accounts` (`type`, `epoch_created`) VALUES (?, ?)",
-                           (define.ACCOUNT_TYPE_GUEST, int(epoch())))
+            insert_accounts_query = "INSERT INTO `accounts` (`type`, `epoch_created`) VALUES (%s, %s)"
+            cursor.execute(insert_accounts_query, (define.ACCOUNT_TYPE_GUEST, int(epoch())))
             user = {"uid": cursor.lastrowid, "type": define.ACCOUNT_TYPE_GUEST}
-            cursor.execute("INSERT INTO `accounts_guests` (`uid`, `device`) VALUES (?, ?)",
-                           (user["uid"], request.json["device"]))
+            insert_guests_query = "INSERT INTO `accounts_guests` (`uid`, `device`) VALUES (%s, %s)"
+            cursor.execute(insert_guests_query, (user["uid"], request.json["device"]))
         else:
-            user = cursor.execute("SELECT * FROM `accounts` WHERE `uid` = ? AND `type` = ?",
-                                  (guest["uid"], define.ACCOUNT_TYPE_GUEST)).fetchone()
+            user_query = "SELECT * FROM `accounts` WHERE `uid` = %s AND `type` = %s"
+            cursor.execute(user_query, (guest["uid"], define.ACCOUNT_TYPE_GUEST))
+            user = cursor.fetchone()
             if not user:
-                print(
-                    f"Found valid account_guest={guest['uid']} for device={guest['device']}, but no such account exists")
-                return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})                  # 客户绑定存在的帐户不在数据库中时
+                print(f"Found valid account_guest={guest['uid']} for device={guest['device']}, but no such account exists")
+                return json_rsp_with_msg(define.RES_LOGIN_ERROR, "系统错误，请稍后再试", {})
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
                 "account_type": user["type"],
@@ -98,6 +107,5 @@ def mdk_guest_login():
             }
         })
     except Exception as err:
-        print(
-            f"Unexpected {err=}, {type(err)=} while handling guest login event")
+        print(f"处理游客登录事件时出现意外错误 {err=}, {type(err)=}")
         return json_rsp_with_msg(define.RES_FAIL, "系统错误，请稍后再试", {})

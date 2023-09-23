@@ -25,27 +25,29 @@ def account_recover():
     cached_data = cache.get(request.form.get('email'))
     if request.method == 'POST':
         email = request.form.get('email')
-        email_exists = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
-                                      (email,)).fetchone()
+        verifycode = request.form.get('verifycode')
+        password = request.form.get('password')
+        passwordv2 = request.form.get('passwordv2')
         if not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', email):
             flash('邮箱格式不正确', 'error')
-        elif not email_exists:
-            flash('该邮箱不存在', 'error')
-        elif request.form.get('verifycode') != cached_data and get_config()['Mail']['ENABLE']:
-            flash('验证码错误', 'error')
-        elif request.form.get('password') != request.form.get('passwordv2'):
-            flash('两次输入的密码不一致', 'error')
-        elif len(request.form.get('password')) < get_config()["Security"]["min_password_len"]:
-            flash(
-                f"密码长度不能小于 {get_config()['Security']['min_password_len']} 字节", 'error')
         else:
-            new_password = password_hash(request.form.get('password'))
-            cursor.execute(
-                "UPDATE `accounts` SET `password` = ? WHERE `email` = ?",
-                (new_password, email)
-            )
-            flash('密码重置成功，请返回登录', 'success')
-            cache.delete(request.form.get('email'))         
+            cursor.execute("SELECT * FROM `accounts` WHERE `email` = %s", (email,))
+            email_exists = cursor.fetchone()
+            if not email_exists:
+                flash('该邮箱不存在', 'error')
+            elif verifycode != cached_data and get_config()['Mail']['ENABLE']:
+                flash('验证码错误', 'error')
+            elif password != passwordv2:
+                flash('两次输入的密码不一致', 'error')
+            elif len(password) < get_config()["Security"]["min_password_len"]:
+                flash(f"密码长度不能小于 {get_config()['Security']['min_password_len']} 字节", 'error')
+            else:
+                new_password = password_hash(password)
+                cursor.execute("UPDATE `accounts` SET `password` = %s WHERE `email` = %s",
+                               (new_password, email))
+                flash('密码重置成功，请返回登录', 'success')
+                cache.delete(email)
+    
     return render_template("account/recover.tmpl")
 
 # 邮件验证码 用于找回密码
@@ -56,8 +58,9 @@ def recover_code():
     if not re.match(email_pattern, email):
         return json_rsp_with_msg(define.RES_FAIL, "邮箱格式不正确", {})
     cursor = get_db().cursor()
-    user = cursor.execute("SELECT * FROM `accounts` WHERE `email` = ?",
-                          (email,)).fetchone()
+    user_query = "SELECT * FROM `accounts` WHERE `email` = %s"
+    cursor.execute(user_query, (email,))
+    user = cursor.fetchone()
     if not user:
         return json_rsp_with_msg(define.RES_FAIL, "该邮箱不存在", {})
     reset_code = ''.join(random.choices(string.digits, k=4))
@@ -69,4 +72,4 @@ def recover_code():
     except:
         return json_rsp_with_msg(define.RES_FAIL, "未知异常，请联系管理员", {})
     cache.set(email, reset_code, timeout=60 * 5)
-    return json_rsp_with_msg(define.RES_SUCCESS, "验证码发送成功，请查收邮箱。", {})
+    return json_rsp_with_msg(define.RES_SUCCESS, "验证码发送成功，请查收邮箱", {})

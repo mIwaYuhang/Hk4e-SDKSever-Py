@@ -12,5 +12,8 @@ def relNameVerify():
 # 海外沙箱
 @app.route("/hk4e_global/combo/guard/api/ping2",methods=['POST'])
 
-/sw.html GET 
-gameBiz=hk4e_global&network=wifi&platform=pc&lang=zh-cn&bundle_id=hk4e_global&runtime_cache=true&game=hk4e&region=dev_docker&level=1&uid=499999999&channel_id=1
+# 登录短信验证
+https://hk4e-sdk.mihoyo.com/hk4e_cn/mdk/shield/api/loginCaptcha ['POST']
+手机登录 type = 1
+账密登录 type = 2
+TAP登录  type = 4
