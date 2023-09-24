@@ -19,6 +19,7 @@ def inject_config():
 
 #=====================校验模块=====================#
 # 账号校验(t_sdk_config)
+@app.route('/inner/account/verify', methods=['POST'])
 def inner_account_verify():
     try:
         data = json.loads(request.data)
@@ -38,7 +39,7 @@ def inner_account_verify():
             "data": {
                 "guest": True if user["type"] == define.ACCOUNT_TYPE_GUEST else False,
                 "account_type": user["type"],
-                "account_uid": token["uid"],
+                "account_uid": str(token["uid"]),
                 "ip_info": {
                     "country_code": get_country_for_ip(token["ip"]) or "CN"
                 }
@@ -119,7 +120,7 @@ def combo_granter_login_v2_login():
                     "durations": [180, 240, 300]
                 },
                 "heartbeat": get_config()["Player"]["heartbeat_required"],
-                "open_id": data["uid"],
+                "open_id": str(data["uid"]),
                 "combo_token": combo_token
             }
         })
@@ -149,7 +150,7 @@ def mdk_shield_api_verify():
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
                 "account": {
-                    "uid": user["uid"],
+                    "uid": str(user["uid"]),
                     "name": mask_string(user["name"]),
                     "email": mask_email(user["email"]),
                     "is_email_verify": get_config()["Login"]["email_verify"],

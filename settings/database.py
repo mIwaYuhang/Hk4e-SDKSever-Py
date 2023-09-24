@@ -51,10 +51,10 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
     
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
                      `uid` INT AUTO_INCREMENT PRIMARY KEY,
-                     `name` TEXT UNIQUE,
-                     `mobile` TEXT UNIQUE,
-                     `email` TEXT UNIQUE,
-                     `password` TEXT,
+                     `name` VARCHAR(255) UNIQUE,
+                     `mobile` VARCHAR(255) UNIQUE,
+                     `email` VARCHAR(255) UNIQUE,
+                     `password` VARCHAR(255),
                      `type` INT NOT NULL,
                      `epoch_created` INT NOT NULL
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -62,25 +62,25 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_tokens` (
                      `uid` INT NOT NULL,
-                     `token` TEXT NOT NULL,
-                     `device` TEXT NOT NULL,
-                     `ip` TEXT NOT NULL,
+                     `token` VARCHAR(255) NOT NULL,
+                     `device` VARCHAR(255) NOT NULL,
+                     `ip` VARCHAR(255) NOT NULL,
                      `epoch_generated` INT NOT NULL,
-                     PRIMARY KEY(`uid`,`token`(255))
+                     PRIMARY KEY(`uid`,`token`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='账号登录token'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_guests` (
                      `uid` INT NOT NULL,
-                     `device` TEXT(255) NOT NULL,
-                     PRIMARY KEY(`uid`,`device`(255))
+                     `device` VARCHAR(255) NOT NULL,
+                     PRIMARY KEY(`uid`,`device`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='游客登录信息表'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_thirdparty` (
                      `uid` INT NOT NULL,
                      `type` INT NOT NULL,
-                     `external_name` TEXT NOT NULL,
+                     `external_name` VARCHAR(255) NOT NULL,
                      `external_id` INT NOT NULL,
                      PRIMARY KEY(`uid`,`type`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -89,15 +89,15 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
     cursor.execute("""CREATE TABLE IF NOT EXISTS `thirdparty_tokens` (
                      `uid` INT NOT NULL,
                      `type` INT NOT NULL,
-                     `token` TEXT NOT NULL
+                     `token` VARCHAR(255) NOT NULL
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='第三方账号登录token'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `combo_tokens` (
                      `uid` INT NOT NULL,
-                     `token` TEXT NOT NULL,
-                     `device` TEXT NOT NULL,
-                     `ip` TEXT NOT NULL,
+                     `token` VARCHAR(255) NOT NULL,
+                     `device` VARCHAR(255) NOT NULL,
+                     `ip` VARCHAR(255) NOT NULL,
                      `epoch_generated` INT NOT NULL,
                      PRIMARY KEY(`uid`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
