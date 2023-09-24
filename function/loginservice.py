@@ -56,7 +56,7 @@ def mdk_shield_api_login():
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
                 "account": {
-                    "uid": user["uid"],
+                    "uid": str(user["uid"]),
                     "name": mask_string(user["name"]),
                     "email": mask_email(user["email"]),
                     "is_email_verify": get_config()["Login"]["email_verify"],
@@ -103,7 +103,7 @@ def mdk_guest_login():
         return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
             "data": {
                 "account_type": user["type"],
-                "guest_id": user["uid"]
+                "guest_id": str(user["uid"])
             }
         })
     except Exception as err:
