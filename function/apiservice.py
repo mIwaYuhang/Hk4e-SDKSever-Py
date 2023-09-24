@@ -28,10 +28,25 @@ def json_rsp(code, message, data=None):
 def combo_granter_api_config():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
+            "log_level": "INFO",
+            "announce_url": "https://sdk.hoyoverse.com/hk4e/announcement/index.html?sdk_presentation_style=fullscreen\u0026announcement_version=1.40\u0026sdk_screen_transparent=true\u0026game_biz=hk4e_global\u0026auth_appid=announcement\u0026game=hk4e#/",
             "disable_ysdk_guard": get_config()["Player"]["disable_ysdk_guard"],  
             "enable_announce_pic_popup": get_config()["Player"]["enable_announce_pic_popup"],  
             "protocol": get_config()["Player"]["protocol"],  
-            "qr_enabled": get_config()["Player"]["qr_enabled"]
+            "qr_enabled": get_config()["Player"]["qr_enabled"],
+            "app_name": "原神海外",
+    		"qr_enabled_apps": {
+			"bbs": get_config()['Player']['qr_bbs'],
+			"cloud": get_config()['Player']['qr_cloud']
+            },
+            "qr_app_icons": {
+			"app": "",
+			"bbs": "",
+			"cloud": ""
+		    },
+            "qr_cloud_display_name": "",
+		    "enable_user_center": get_config()['Player']['enable_user_center'],
+		    "functional_switch_configs": {}
         }
     })
 
@@ -54,12 +69,20 @@ def mdk_shield_api_loadConfig():
             "name": "原神",
             "disable_regist": get_config()["Login"]["disable_regist"],                     
             "enable_email_captcha": get_config()["Login"]["enable_email_captcha"],          
-            "thirdparty": ["tp"],
+            "thirdparty": ["tp","fb","tw"], # taptap facebook twitter
             "disable_mmt": get_config()["Login"]["disable_mmt"],                            
             "server_guest": get_config()["Auth"]["enable_guest"],
             "thirdparty_ignore": {},
             "enable_ps_bind_account": get_config()["Login"]["enable_ps_bind_account"],
-		    "thirdparty_login_configs": {},
+    		"thirdparty_login_configs": {
+			"fb": {
+				"token_type": "TK_GAME_TOKEN",
+				"game_token_expires_in": 2592000
+			},
+			"tw": {
+				"token_type": "TK_GAME_TOKEN",
+				"game_token_expires_in": 2592000
+			}},
 		    "initialize_firebase": get_config()["Login"]["initialize_firebase"],
 		    "bbs_auth_login": get_config()["Login"]["bbs_auth_login"],
 		    "bbs_auth_login_ignore": [],
@@ -79,13 +102,26 @@ def mdk_agreement_api_get():
     })
 
 # 协议比较(https://sandbox-sdk-os.hoyoverse.com)
+# 
 @app.route('/hk4e_cn/combo/granter/api/compareProtocolVersion', methods=['POST'])
 @app.route('/hk4e_global/combo/granter/api/compareProtocolVersion', methods=['POST'])
 def combo_granter_api_protocol():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
             "modified": get_config()["Other"]["modified"],
-            "protocol": {}
+            "protocol": {
+			"id": 0,
+			"app_id": 4,
+			"language": "zh-cn",
+			"user_proto": "",
+			"priv_proto": "",
+			"major": 12,
+			"minimum": 0,
+			"create_time": "0",
+			"teenager_proto": "",
+			"third_proto": "",
+			"full_priv_proto": ""
+            }
         }
     })
 
@@ -94,8 +130,19 @@ def combo_granter_api_protocol():
 def combo_box_api_config_sdk_combo():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
-            "disable_email_bind_skip": get_config()["Login"]["disable_email_bind_skip"], 
-            "email_bind_remind": get_config()["Login"]["email_bind_remind"],  
+            "vals": {
+                "telemetry_config": "{\n\"dataupload_enable\": 1\n}",
+                "new_register_page_enable": get_config()['Other']['new_register_page_enable'],
+                "disable_email_bind_skip": get_config()["Login"]["disable_email_bind_skip"],
+                "kcp_enable": get_config()['Other']['kcp_enable'],
+                "enable_web_dpi": get_config()['Other']['enable_web_dpi'],
+                "network_report_config": "{ \"enable\": 1, \"status_codes\": [206], \"url_paths\": [\"dataUpload\"] }",
+                "email_bind_remind_interval": "7",  # 不知道
+                "kibana_pc_config": "{ \"enable\": 1, \"level\": \"Info\", \"modules\": [\"download\"] }",
+                "pay_payco_centered_host": "bill.payco.com",
+                "list_price_tierv2_enable": get_config()['Other']['list_price_tierv2_enable'],
+                "email_bind_remind": get_config()["Login"]["email_bind_remind"]
+            }
         }
     })
 

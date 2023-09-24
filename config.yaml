@@ -6,7 +6,7 @@ Setting:
   reload: false
   debug: false
   threaded: true
-  high_frequency_logs: true             # sdk是否启用高频日志
+  high_frequency_logs: false             # sdk是否启用高频日志
   secret_key: "cokeserver2022"
 Database:
   host: 192.168.1.8
@@ -35,6 +35,9 @@ Player:
   enable_announce_pic_popup: true       # 启用弹窗
   protocol: true                        # 启用协议
   qr_enabled: false                     # 启用二维码功能
+  qr_bbs: false                         # BBS 二维码登录
+  qr_cloud: false                       # 云原神二维码登录
+  enable_user_center: true              # 玩家中心
   guardian_required: false              # 需要家长验证
   realname_required: false              # 需要实名验证
   heartbeat_required: true              # 发送心跳包
@@ -54,12 +57,31 @@ Auth:
 Other:
   modified: true                        # 追踪对象或实体的变更状态或时间
   serviceworker: true                   # 启用分析
+  new_register_page_enable: true
+  kcp_enable: false
+  enable_web_dpi: true
+  list_price_tierv2_enable: true
 
 # Global Settings
-Dispatch:
-  global: "http://192.168.1.8:21041"
-  local:
-    dev_docker: "http://192.168.1.8:21041"
+#Dispatch:
+#  global: "http://192.168.1.8:21041"
+#  local:
+#    dev_docker: "http://192.168.1.8:21041"
+
+Gateserver:
+  - name: dev_docker
+    title: GenshinServer-28live
+    dispatchUrl: http://192.168.1.8:21000/query_region/dev_docker
+  - name: dev_client
+    title: Dev-测试渠道1
+    dispatchUrl: http://192.168.1.5:21000/query_region/dev_docker
+  - name: dev_common 
+    title: Dev-测试渠道2
+    dispatchUrl: http://127.0.0.1:21041/query_region/dev_common
+  - name: dev_gio
+    title: Dev-测试渠道3
+    dispatchUrl: http://127.0.0.1:20001/query_cur_region
+
 Crypto:
   rsa:
     password: "./data/key/passwdword.pem"

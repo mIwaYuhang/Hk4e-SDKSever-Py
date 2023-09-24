@@ -5,6 +5,10 @@ GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"
 AUTHVERIFY_KEY_PATH = "./data/key/authverify.pem"
 PASSWDWORD_KEY_PATH = "./data/key/password.pem"
 
+DISPATCH_KEY = "./data/key/dispatchKey.bin"
+DISPATCH_SEED = "./data/key/dispatchSeed.bin"
+
+
 GACHA_TEXTMAP_PATH = './data/gacha/textmap'
 GACHA_SCHEDULE_PATH = './data/gacha/schedule'
 

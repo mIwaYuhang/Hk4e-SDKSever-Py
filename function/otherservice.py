@@ -89,7 +89,7 @@ def mi18n_serve(language):
 def view_config():
     config_path = define.CONFIG_FILE_PATH
     try:
-        with open(config_path, 'r') as file:
+        with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
         return config_data
     except FileNotFoundError:
@@ -102,7 +102,7 @@ def view_config():
 def view_authverify_key():
     config_path = define.AUTHVERIFY_KEY_PATH
     try:
-        with open(config_path, 'r') as file:
+        with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
         return config_data
     except FileNotFoundError:
@@ -115,7 +115,7 @@ def view_authverify_key():
 def view_password_key():
     config_path = define.PASSWDWORD_KEY_PATH
     try:
-        with open(config_path, 'r') as file:
+        with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
         return config_data
     except FileNotFoundError:
