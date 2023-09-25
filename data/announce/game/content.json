@@ -4,6 +4,13 @@
 	"data": {
 		"list": [{
 			"ann_id": 3742,
+			"title": "Welcome to use SDKServer By Coke",
+			"subtitle": "CokeServer",
+			"banner": "https://sdk-webstatic.mihoyo.com/upload/ann/2023/08/09/dd973a6f11a8e85b6a52a5e16e769a82_2070780501386666293.jpg",
+			"content": "感谢你使用本SDKSERVER！\u003cp style=\"white-space: pre-wrap;\"\u003e\u003cstrong\u003e〓项目地址〓\u003c/strong\u003e\u003cbr\u003e\u003ca href=\"javascript:miHoYoGameJSSDK.openInBrowser('https://github.com/CokeSR/Hk4e-SDKSever-Py');\"\u003eCokeSR@Hk4e-SDKSever-Py\u003c/a\u003e\u003c/p\u003e\u003cp style=\"white-space: pre-wrap; min-height: 1.5em;\"\u003e\u003cstrong\u003e〓QQ交流群〓\u003c/strong\u003e\u003cbr\u003e\u003ca href=\"javascript:miHoYoGameJSSDK.openInBrowser('http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=VufQMsKKQ4qgP4TX4SHDzwZp2bPap3BJ&authKey=IpEWy908iDHJyAxs6%2F%2BHVx0MGlbtYLlhiBBEahU5tIc3j7wrPRgNSBgn9L1KPnZ%2F&noverify=0&group_code=498902680');\"\u003eCokeSR@我不是O神\u003c/a\u003e\u003c/p\u003e\u003cp style=\"white-space: pre-wrap; min-height: 1.5em;\"",
+			"lang": "zh-cn"
+		}, {
+			"ann_id": 3742,
 			"title": "「仿若无因飘落的轻雨」4.0版本更新说明",
 			"subtitle": "4.0版本更新说明",
 			"banner": "https://sdk-webstatic.mihoyo.com/upload/ann/2023/08/09/dd973a6f11a8e85b6a52a5e16e769a82_2070780501386666293.jpg",

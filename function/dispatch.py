@@ -1,21 +1,12 @@
 from __main__ import app
-import json
-import base64
 import yaml
 import settings.define as define
 import data.proto.QueryRegionListHttpRsp_pb2 as RegionList
-import data.proto.QueryCurrRegionHttpRsp_pb2 as QueryCur
-import data.proto.RegionInfo_pb2 as RegionInfo
 
 from flask import Response
 from base64 import b64encode
 from flask_caching import Cache
-from flask import request, abort
 from settings.config import get_config
-from settings.utils import forward_request
-from typing import Callable
-from http import HTTPStatus
-from net import ResolveUDPAddr
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
@@ -57,11 +48,12 @@ def query_dispatch():
     serialized_data = updated_region_list.SerializeToString()
     base64_str = b64encode(serialized_data).decode()
     return Response(base64_str, content_type='text/plain')
-# 实验性解析QueryCurRegion
+# 实验性解析QueryCurRegion(暂时留空 先不写)
 # version=OSRELWin2.8.0 lang=2 platform=3 binary=1 time=348 channel_id=1 sub_channel_id=1 account_type=1 dispatchSeed=caffbdd6d7460dff key_id=3
 @app.route('/query_region/<name>', methods=['GET'])
 @app.route('/query_cur_region/<name>', methods=['GET'])
-
+def query_cur_region():
+    return "Not found"
 
 '''
 全局dispatch (转发到dispatch后返回结果)

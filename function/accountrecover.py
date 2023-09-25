@@ -18,6 +18,7 @@ def inject_config():
     config = get_config()
     return {'config': config}
 
+#=====================找回密码=====================#
 # 找回密码(功能不可用)
 @app.route('/account/recover', methods=['GET', 'POST'])
 def account_recover():
@@ -47,7 +48,6 @@ def account_recover():
                                (new_password, email))
                 flash('密码重置成功，请返回登录', 'success')
                 cache.delete(email)
-    
     return render_template("account/recover.tmpl")
 
 # 邮件验证码 用于找回密码

@@ -1,19 +1,52 @@
 #=====================未开发的功能=====================#
 # 新设备邮箱验证(路由指向/hk4e_global/mdk/shield/api/login)
 @app.route("/account/device/api/preGrantByTicket",methods=['POST'])
-def newEquipmentMailVerify():
-    return
 
 # 实名认证
 @app.route("/hk4e_cn/mdk/shield/api/actionTicket",methods=['POST'])
-def relNameVerify():
-    return
 
 # 海外沙箱
 @app.route("/hk4e_global/combo/guard/api/ping2",methods=['POST'])
 
 # 登录短信验证
-https://hk4e-sdk.mihoyo.com/hk4e_cn/mdk/shield/api/loginCaptcha ['POST']
+@app.route("/hk4e_cn/mdk/shield/api/loginCaptcha",methods=['POST'])
 手机登录 type = 1
 账密登录 type = 2
 TAP登录  type = 4
+
+# 扫码登录
+@app.route("/hk4e_cn/combo/panda/qrcode/query",methods=['POST'])
+
+# 开门前公告
+/admin/swpreload/hk4e_cn/zh-cn.json?timestamp=1695568890000
+
+/hk4e_cn/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_cn&lang=zh-cn&bundle_id=hk4e_cn&channel_id=1&platform=pc&region=cn_gf01
+
+
+
+/hk4e_cn/announcement/api/getAnnContent?game=hk4e&game_biz=hk4e_cn&lang=zh-cn&bundle_id=hk4e_cn&platform=pc&region=cn_gf01&t=1695579806000&channel_id=1
+
+
+# 开门后公告
+/hk4e_cn/announcement/api/getAlertAnn?bundle_id=hk4e_cn&channel_id=1&game=hk4e&game_biz=hk4e_cn&lang=zh-cn&level=60&platform=pc&region=cn_gf01&uid=203952922
+/hk4e_cn/announcement/api/getAlertPic?bundle_id=hk4e_cn&channel_id=1&game=hk4e&game_biz=hk4e_cn&lang=zh-cn&level=60&platform=pc&region=cn_gf01&uid=203952922
+/common/hk4e_cn/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_cn&lang=zh-cn&bundle_id=hk4e_cn&channel_id=1&level=60&platform=pc&region=cn_gf01&uid=203952922
+/hk4e_cn/announcement/api/getAnnContent?game=hk4e&game_biz=hk4e_cn&lang=zh-cn&bundle_id=hk4e_cn&platform=pc&region=cn_gf01&t=1695567600000&level=60&channel_id=1
+
+# dispatch(官服region：cn_gf01)
+@app.route("/dispatch/dispatch/getGateAddress",methods=['GET'])
+
+# 设备上报
+https://public-data-api.mihoyo.com/device-fp/api/getFp
+{"retcode":0,"message":"OK","data":{"device_fp":"38d7ecd67b187","code":200,"msg":"ok"}}
+
+# 支付(GET)
+https://api-payment.mihoyo.com/plutus/api/v2/check?biz_order_no=1705961426129539584
+{"retcode":0,"message":"OK","data":{"status":"CheckStatusInit"}}
+
+https://api-payment.mihoyo.com/plutus/api/v2/listPayPlat?disable_market=false&expand_mixed_qrcode=true&fold_other=true
+{"retcode":0,"message":"OK","data":{"is_new_user":false,"pay_plats":[{"is_recommend":true,"market_word":"","merchant_info":{"merchant_id":"cf14b1nnn00t3crm9pdg","mini_program_id":"","official_account_id":""},"pay_plat":"alipay","pay_type":"alipay","pay_type_icon_url":"https://sdk-webstatic.mihoyo.com/sdk-payment-upload/2023/01/11/39b073aecd836c23fcc946cb21f44cb8_8633839261714476275.png","pay_type_name":"支付宝","market_id":"0","use_market":false,"use_official_qrcode":false,"real_cashier_id":""},{"is_recommend":false,"market_word":"","merchant_info":{"merchant_id":"cf14dannn00t27ue4u50","mini_program_id":"","official_account_id":"wx4b7e11b9e935040b"},"pay_plat":"wechatpay","pay_type":"wechatpay","pay_type_icon_url":"https://sdk-webstatic.mihoyo.com/sdk-payment-upload/2023/01/11/872a682b635c801b568214479464092b_4558682075688947537.png","pay_type_name":"微信支付","market_id":"0","use_market":false,"use_official_qrcode":false,"real_cashier_id":""}],"selected_pay_type":"alipay","fold_other":false,"fold_other_final":false,"expand_mixed_qrcode":true,"expand_mixed_qrcode_final":true,"use_official_qrcode":false}}
+
+# 买月卡(POST)
+https://hk4e-sdk.mihoyo.com/hk4e_cn/mdk/luckycat/luckycat/createOrder?
+{"who":{"account":"300086382","token":"4TMgCuMr632vDcYsQMx8QvFBdGkkZJCP"},"order":{"channel_id":"1","account":"300086382","pay_plat":"payment-cn","country":"CHN","currency":"CNY","amount":3000,"game":"hk4e_cn","region":"cn_gf01","uid":"203952922","goods_id":"ys_chn_blessofmoon_tier5","goods_title":"空月祝福","goods_num":"1","client_type":3,"device":"4d2b561c85e3929b2a7481eb9a6c428191e272441673786542389","price_tier":"Tier_5","delivery_url":"http://10.101.11.129:22601/recharge"},"sign":"cd5e7bf46fd06c0a6804f4d0a758d4159a5d0ae608af3f4b434ccb3786ce9200","do_not_notice_again":false}

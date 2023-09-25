@@ -77,7 +77,10 @@ def sdk_log():
 @app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-version.json', methods=['GET'])
 @app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json', methods=['GET'])
 def mi18n_version():
-    return json_rsp(define.RES_SUCCESS, {"version": 51})
+    return json_rsp(define.RES_SUCCESS, {"version": 79})
+@app.route('/admin/mi18n/plat_os/m09291531181441/m09291531181441-version.json',methods=['GET'])
+def min18_os_version():
+    return json_rsp(define.RES_SUCCESS, {"version": 16})
 @app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-<language>.json', methods=['GET'])
 @app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-<language>.json', methods=['GET'])
 def mi18n_serve(language):

@@ -2,7 +2,7 @@ from __main__ import app
 import os
 import settings.define as define
 
-from flask import render_template, send_file
+from flask import render_template, request, send_file
 from flask_caching import Cache
 from settings.config import get_config
 from settings.response import json_rsp_with_msg
@@ -27,26 +27,43 @@ def get_alertann():
         }
     })
 
-# 获取公告
-@app.route('/common/hk4e_cn/announcement/api/getAlertPic', methods=['GET'])
-@app.route('/common/hk4e_cn/announcement/api/getAnnList', methods=['GET'])
-@app.route('/common/hk4e_global/announcement/api/getAlertPic', methods=['GET'])
-@app.route('/common/hk4e_global/announcement/api/getAnnList', methods=['GET'])
-def get_alertPic():
-    file_path = define.ANNOUNCE_PATH
+# 蓝贴
+@app.route("/admin/swpreload/hk4e_cn/zh-cn.json",methods=['GET'])
+def blue_post():
+    file_path = define.ANNOUNCE_BLUE_PATH
     if os.path.exists(file_path):
         return send_file(file_path)
     else:
         return "Not found"
 
-@app.route('/common/hk4e_cn/announcement/api/getAnnContent', methods=['GET'])
-@app.route('/common/hk4e_global/announcement/api/getAnnContent', methods=['GET'])
-def ann_content():
-    file_path = define.ANNOUNCE_CONTENT_PATH
+
+# 获取公告(进门前获取content和list，进门后获取ann pic content 用是否有level字段来区分)
+@app.route('/common/hk4e_cn/announcement/api/getAlertPic', methods=['GET'])
+@app.route('/common/hk4e_global/announcement/api/getAlertPic', methods=['GET'])
+def get_pic():
+    file_path = define.ANNOUNCE_PATH_INGAME
     if os.path.exists(file_path):
         return send_file(file_path)
     else:
         return "Not found"
+@app.route('/common/hk4e_cn/announcement/api/getAnnList', methods=['GET'])
+@app.route('/common/hk4e_global/announcement/api/getAnnList', methods=['GET'])
+def get_list():
+    if 'level' in request.args:
+        return send_file(define.ANNOUNCE_PATH_INGAME, mimetype='application/json')
+    else:
+        return send_file(define.ANNOUNCE_PATH_INGATE, mimetype='application/json')
+# 游戏外level=undefined 要注意一下
+@app.route('/common/hk4e_cn/announcement/api/getAnnContent', methods=['GET'])
+@app.route('/common/hk4e_global/announcement/api/getAnnContent', methods=['GET'])
+def get_content():
+    level = request.args.get('level')
+    if level == 'undefined':
+        return send_file(define.ANNOUNCE_CONTENT_PATH_INGATE, mimetype='application/json')
+    elif level is not None:                   # level参数是无或者是其他的默认返回游戏内公告内容
+        return send_file(define.ANNOUNCE_CONTENT_PATH_INGAME, mimetype='application/json')
+    else:
+        return send_file(define.ANNOUNCE_CONTENT_PATH_INGATE, mimetype='application/json')
 
 # 公告模块
 @app.route('/hk4e/announcement/index.html', methods=['GET'])
@@ -57,38 +74,44 @@ def handle_announcement():
 @app.route('/hk4e_cn/combo/granter/api/getFont', methods = ['GET'])
 @app.route('/hk4e_global/combo/granter/api/getFont', methods = ['GET'])
 def get_font():
-   return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
-      "data":{
-         "fonts":[
-            {
-               "font_id":"0",
-               "app_id":0,
-               "name":"zh-cn.ttf",
-               "url":"https://webstatic.mihoyo.com/upload/font-lib/2023/03/01/4398dec1a0ffa3d3ce99ef1424107550_4765013443347169028.ttf",
-               "md5":"4398dec1a0ffa3d3ce99ef1424107550"
-            },
-            {
-               "font_id":"0",
-               "app_id":0,
-               "name":"ja.ttf",
-               "url":"https://webstatic.mihoyo.com/upload/font-lib/2023/03/01/2c148f36573625fc03c82579abd26fb1_1167469228143141125.ttf",
-               "md5":"2c148f36573625fc03c82579abd26fb1"
-            }
-         ]
-      }
-   })
+    file_path = define.ANNOUNCE_FONT_PATH
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"
 
 # 资源文件
 @app.route('/hk4e/announcement/2_2e4d2779ad3d19e6406f.js',methods=['GET'])
 def get_js():
-    file_path = define.ANNOUNCE_JS_PATH
+    file_path = define.ANNOUNCE_JS_PATH1
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"
+@app.route('/hk4e/announcement/vendors_3230378b06826ebc94d3.js',methods=['GET'])
+def get_vendors_js():
+    file_path = define.ANNOUNCE_JS_PATH2
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"
+@app.route('/hk4e/announcement/bundle_9f9d2fd05b63fd8decfc.js',methods=['GET'])
+def get_bundle_js():
+    file_path = define.ANNOUNCE_JS_PATH3
     if os.path.exists(file_path):
         return send_file(file_path)
     else:
         return "Not found"
 @app.route('/hk4e/announcement/2_cb04d2d72d7555e2ab83.css',methods=['GET'])
 def get_css():
-    file_path = define.ANNOUNCE_CSS_PATH
+    file_path = define.ANNOUNCE_CSS_PATH1
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "Not found"
+@app.route('/hk4e/announcement/bundle_dad917ca6970b9fa0ec0.css',methods=['GET'])
+def get_bundel():
+    file_path = define.ANNOUNCE_CSS_PATH2
     if os.path.exists(file_path):
         return send_file(file_path)
     else:

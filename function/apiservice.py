@@ -141,7 +141,8 @@ def combo_box_api_config_sdk_combo():
                 "kibana_pc_config": "{ \"enable\": 1, \"level\": \"Info\", \"modules\": [\"download\"] }",
                 "pay_payco_centered_host": "bill.payco.com",
                 "list_price_tierv2_enable": get_config()['Other']['list_price_tierv2_enable'],
-                "email_bind_remind": get_config()["Login"]["email_bind_remind"]
+                "email_bind_remind": get_config()["Login"]["email_bind_remind"],
+                "payment_cn_config": "{ \"h5_cashier_enable\": 0, \"h5_cashier_timeout\": 3}"
             }
         }
     })
@@ -172,6 +173,7 @@ def combo_box_api_config_sw_precache():
     return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
         "data": {
             "vals": {
+                "url":"",
                 "enable": get_config()["Other"]["serviceworker"]         # 是否加载ServiceWorker进行分析
             }
         }
