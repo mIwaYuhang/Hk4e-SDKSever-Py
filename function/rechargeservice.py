@@ -1,12 +1,10 @@
 from __main__ import app
-import json
 import os
+import settings.repositories as repositories
 
 from flask import send_file
-import settings.define as define
-
 from flask_caching import Cache
-from settings.config import get_config
+from settings.loadconfig import get_config
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
@@ -21,7 +19,7 @@ def inject_config():
 @app.route('/hk4e_global/mdk/shopwindow/shopwindow/listPriceTier', methods = ['POST'])
 @app.route('/hk4e_global/mdk/shopwindow/shopwindow/listPriceTierV2', methods = ['POST'])
 def price_tier_serve():
-    file_path = define.SHOPWINDOW_TIERS_PATH
+    file_path = repositories.SHOPWINDOW_TIERS_PATH
     if os.path.exists(file_path):
         return send_file(file_path)
     else:
@@ -31,7 +29,7 @@ def price_tier_serve():
 @app.route('/hk4e_cn/mdk/tally/tally/listPayPlat', methods = ['POST'])
 @app.route('/hk4e_global/mdk/tally/tally/listPayPlat', methods = ['POST'])
 def price_pay_types_serve():
-    file_path = define.SHOPWINDOW_PAY_TYPES_PATH
+    file_path = repositories.SHOPWINDOW_PAY_TYPES_PATH
     if os.path.exists(file_path):
         return send_file(file_path)
     else:

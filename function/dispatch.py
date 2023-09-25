@@ -1,12 +1,13 @@
 from __main__ import app
+import sys
 import yaml
-import settings.define as define
+import settings.repositories as repositories
 import data.proto.QueryRegionListHttpRsp_pb2 as RegionList
 
 from flask import Response, abort, request
 from base64 import b64encode
 from flask_caching import Cache
-from settings.config import get_config
+from settings.loadconfig import get_config
 from settings.utils import forward_request
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -15,11 +16,11 @@ def inject_config():
     config = get_config()
     return {'config': config}
 
-with open(define.CONFIG_FILE_PATH, 'r', encoding="utf-8") as f:
+with open(repositories.CONFIG_FILE_PATH, 'r', encoding="utf-8") as f:
     config = yaml.safe_load(f)
-with open(define.DISPATCH_KEY, 'rb') as f:
+with open(repositories.DISPATCH_KEY, 'rb') as f:
     dispatch_key = f.read()
-with open(define.DISPATCH_SEED, 'rb') as f:
+with open(repositories.DISPATCH_SEED, 'rb') as f:
     dispatch_seed = f.read()
 
 #=====================Dispatch配置=====================#
@@ -29,8 +30,13 @@ with open(define.DISPATCH_SEED, 'rb') as f:
 @app.route('/query_region_list', methods=['GET'])
 def query_dispatch():
     response = RegionList.QueryRegionListHttpRsp()
-    response.retcode = define.RES_SUCCESS
+    response.retcode = repositories.RES_SUCCESS
     for entry in config['Gateserver']:
+        if ('name' not in entry or not entry['name'] or
+            'title' not in entry or not entry['title'] or
+            'dispatchUrl' not in entry or not entry['dispatchUrl']):
+            print("#=====================Region读取失败！请检查[Config]配置=====================#")       # 客户端请求的时候再检查一下 如果不符合就原地抛锚
+            sys.exit(1)
         region_info = response.region_list.add()
         region_info.name = entry['name']
         region_info.title = entry['title']

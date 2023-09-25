@@ -3,6 +3,7 @@ import json
 
 from flask import Response, render_template
 
+#=====================创建回应=====================#
 # 错误处理
 @app.errorhandler(404)
 def page_not_found(e):

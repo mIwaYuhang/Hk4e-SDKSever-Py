@@ -1,9 +1,14 @@
 from __main__ import app
-from flask import g
-import settings.define as define
-import pymysql
+import sys
 import yaml
+import pymysql
+import settings.database as database
+import settings.repositories as repositories
 
+from settings.checkstatus import check_mysql_connection
+from flask import g
+
+#=====================数据库创建=====================#
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -11,7 +16,7 @@ def dict_factory(cursor, row):
     return d
 
 def get_config():
-    with open(define.CONFIG_FILE_PATH, encoding='utf-8') as file:
+    with open(repositories.CONFIG_FILE_PATH, encoding='utf-8') as file:
         config = yaml.safe_load(file)
     return config
 
@@ -113,3 +118,12 @@ def close_connection(exception):
     if db is not None:
         db.commit()
         db.close()
+
+# 重置数据库
+def initialize_database():
+    print(">> 正在初始化数据库结构(清空数据)...")
+    if not check_mysql_connection():
+        print("#======================Mysql连接失败！请检查服务配置======================#")
+        sys.exit(1)
+    database.init_db()
+    print(">> 初始化数据库完成")

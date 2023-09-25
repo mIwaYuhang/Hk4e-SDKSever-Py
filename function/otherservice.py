@@ -1,12 +1,11 @@
 from __main__ import app
-
 import yaml
-import settings.define as define
+import settings.repositories as repositories
 
-from flask import send_from_directory, render_template
 from flask_caching import Cache
+from settings.loadconfig import get_config
+from flask import send_from_directory, render_template
 from settings.response import json_rsp, json_rsp_with_msg
-from settings.config import get_config
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
@@ -24,7 +23,7 @@ def account_index():
 # 检查SDK配置(https://testing-abtest-api-data-sg.mihoyo.com) 不知道什么用 不写config
 @app.route('/data_abtest_api/config/experiment/list', methods=['GET', 'POST'])
 def abtest_config_experiment_list():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": [{
 		"code": 1000,
 		"type": 2,
@@ -71,26 +70,26 @@ def abtest_config_experiment_list():
 @app.route('/sdk/dataUpload', methods=['POST'])
 @app.route('/common/h5log/log/batch', methods=['POST'])
 def sdk_log():
-    return json_rsp(define.RES_SUCCESS, {})
+    return json_rsp(repositories.RES_SUCCESS, {})
 
 #======================mi18n======================#
 @app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-version.json', methods=['GET'])
 @app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json', methods=['GET'])
 def mi18n_version():
-    return json_rsp(define.RES_SUCCESS, {"version": 79})
+    return json_rsp(repositories.RES_SUCCESS, {"version": 79})
 @app.route('/admin/mi18n/plat_os/m09291531181441/m09291531181441-version.json',methods=['GET'])
 def min18_os_version():
-    return json_rsp(define.RES_SUCCESS, {"version": 16})
+    return json_rsp(repositories.RES_SUCCESS, {"version": 16})
 @app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-<language>.json', methods=['GET'])
 @app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-<language>.json', methods=['GET'])
 def mi18n_serve(language):
-    return send_from_directory(define.MI18N_PATH, f"{language}.json")
+    return send_from_directory(repositories.MI18N_PATH, f"{language}.json")
 
 #================cokeserver-config================#
 @app.route('/hk4e_cn/developers/config.yaml',methods=['GET'])
 @app.route('/hk4e_global/developers/config.yaml',methods=['GET'])
 def view_config():
-    config_path = define.CONFIG_FILE_PATH
+    config_path = repositories.CONFIG_FILE_PATH
     try:
         with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
@@ -103,7 +102,7 @@ def view_config():
 @app.route('/hk4e_cn/developers/keys/authverify.pem',methods=['GET'])
 @app.route('/hk4e_global/developers/keys/authverify.pem',methods=['GET'])
 def view_authverify_key():
-    config_path = define.AUTHVERIFY_KEY_PATH
+    config_path = repositories.AUTHVERIFY_KEY_PATH
     try:
         with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
@@ -116,7 +115,7 @@ def view_authverify_key():
 @app.route('/hk4e_cn/developers/keys/password.pem',methods=['GET'])
 @app.route('/hk4e_global/developers/keys/password.pem',methods=['GET'])
 def view_password_key():
-    config_path = define.PASSWDWORD_KEY_PATH
+    config_path = repositories.PASSWDWORD_KEY_PATH
     try:
         with open(config_path, 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)

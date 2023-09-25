@@ -1,8 +1,9 @@
 from __main__ import app
 import json
-import settings.define as define
+import settings.repositories as repositories
+
 from flask_caching import Cache
-from settings.config import get_config
+from settings.loadconfig import get_config
 from flask import request,abort, render_template
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -23,14 +24,14 @@ def gacha_info(id):
     }
     language = request.args.get('lang') or 'en'
     try:
-        f = open(f"{define.GACHA_SCHEDULE_PATH}/{id}.json")                  # 加载当前卡池祈愿规则
+        f = open(f"{repositories.GACHA_SCHEDULE_PATH}/{id}.json")                  # 加载当前卡池祈愿规则
         schedule = json.load(f)
         f.close()
     except Exception as err:
         abort(
             404, description=f"Unexpected {err=}, {type(err)=} while loading gacha schedule data for {id=}")
     try:
-        f = open(f"{define.GACHA_TEXTMAP_PATH}/{language}.json")            # 加载适配的语言
+        f = open(f"{repositories.GACHA_TEXTMAP_PATH}/{language}.json")            # 加载适配的语言
         textmap = json.load(f)
         f.close()
     except Exception as err:

@@ -2,12 +2,14 @@ import requests
 import bcrypt
 import hashlib
 import geoip2.database
-import settings.define as define
+import settings.repositories as repositories
 
-from settings.config import get_config
+from settings.loadconfig import get_config
 
+#=====================函数库=====================#
+# 通过IP来检查是哪个国家
 def get_country_for_ip(ip):
-   with geoip2.database.Reader(define.GEOIP2_DB_PATH) as reader:
+   with geoip2.database.Reader(repositories.GEOIP2_DB_PATH) as reader:
       try:
          return reader.country(ip).country.iso_code
       except geoip2.errors.AddressNotFoundError:

@@ -1,9 +1,9 @@
 from __main__ import app
-import settings.define as define
+import settings.repositories as repositories
 
 from flask import request
 from flask_caching import Cache
-from settings.config import get_config
+from settings.loadconfig import get_config
 from settings.response import json_rsp, json_rsp_with_msg
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -26,7 +26,7 @@ def json_rsp(code, message, data=None):
 @app.route('/hk4e_cn/combo/granter/api/getConfig', methods=['GET'])
 @app.route('/hk4e_global/combo/granter/api/getConfig', methods=['GET'])
 def combo_granter_api_config():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "log_level": "INFO",
             "announce_url": "https://sdk.hoyoverse.com/hk4e/announcement/index.html?sdk_presentation_style=fullscreen\u0026announcement_version=1.40\u0026sdk_screen_transparent=true\u0026game_biz=hk4e_global\u0026auth_appid=announcement\u0026game=hk4e#/",
@@ -56,8 +56,8 @@ def combo_granter_api_config():
 def mdk_shield_api_loadConfig():
     client = request.args.get('client', '')  # 提供默认值为空字符串
     if client.isdigit():
-        client = define.PLATFORM_TYPE[int(client)]
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+        client = repositories.PLATFORM_TYPE[int(client)]
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "id": 6,
             "game_key": request.args.get('game_key'),
@@ -65,7 +65,7 @@ def mdk_shield_api_loadConfig():
             "identity": "I_IDENTITY",
             "guest": get_config()["Auth"]["enable_guest"],
             "ignore_versions": "",
-            "scene": define.SCENE_ACCOUNT,
+            "scene": repositories.SCENE_ACCOUNT,
             "name": "原神",
             "disable_regist": get_config()["Login"]["disable_regist"],                     
             "enable_email_captcha": get_config()["Login"]["enable_email_captcha"],          
@@ -95,7 +95,7 @@ def mdk_shield_api_loadConfig():
 @app.route('/hk4e_cn/mdk/agreement/api/getAgreementInfos', methods=['GET'])
 @app.route('/hk4e_global/mdk/agreement/api/getAgreementInfos', methods=['GET'])
 def mdk_agreement_api_get():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "marketing_agreements": []
         }
@@ -106,7 +106,7 @@ def mdk_agreement_api_get():
 @app.route('/hk4e_cn/combo/granter/api/compareProtocolVersion', methods=['POST'])
 @app.route('/hk4e_global/combo/granter/api/compareProtocolVersion', methods=['POST'])
 def combo_granter_api_protocol():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "modified": get_config()["Other"]["modified"],
             "protocol": {
@@ -128,7 +128,7 @@ def combo_granter_api_protocol():
 # 获取SDKCombo配置信息
 @app.route('/combo/box/api/config/sdk/combo', methods=['GET'])
 def combo_box_api_config_sdk_combo():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "vals": {
                 "telemetry_config": "{\n\"dataupload_enable\": 1\n}",
@@ -151,7 +151,7 @@ def combo_box_api_config_sdk_combo():
 @app.route('/hk4e_cn/combo/red_dot/list', methods=['POST'])
 @app.route('/hk4e_global/combo/red_dot/list', methods=['POST'])
 def red_dot():
-    return json_rsp(define.RES_SUCCESS, "ok", {
+    return json_rsp(repositories.RES_SUCCESS, "ok", {
         "infos": []
     })
 """
@@ -170,7 +170,7 @@ def red_dot():
 # 预加载
 @app.route('/combo/box/api/config/sw/precache', methods=['GET'])
 def combo_box_api_config_sw_precache():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "vals": {
                 "url":"",
@@ -182,7 +182,7 @@ def combo_box_api_config_sw_precache():
 # 问卷调查
 @app.route('/device-fp/api/getExtList', methods=['GET'])
 def device_fp_get_ext_list():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
 	"data": {
 		"code": 200,
 		"msg": "ok",
@@ -198,12 +198,12 @@ def device_fp_get_ext_list():
 @app.route('/hk4e_global/combo/guard/api/ping',methods=['POST'])
 @app.route('/hk4e_global/combo/guard/api/ping2',methods=['POST'])
 def pingResponse():
-   return json_rsp(define.RES_SUCCESS, {})
+   return json_rsp(repositories.RES_SUCCESS, {})
 
 # 消费提醒
 @app.route('/common/hk4e_cn/announcement/api/consumeRemind',methods=['GET'])
 @app.route('/common/hk4e_global/announcement/api/consumeRemind',methods=['GET'])
 def consume_remind():
-    return json_rsp_with_msg(define.RES_SUCCESS, "OK", {
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": []
     })

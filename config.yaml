@@ -41,8 +41,8 @@ Player:
   guardian_required: false              # 需要家长验证
   realname_required: false              # 需要实名验证
   heartbeat_required: true              # 发送心跳包
-# Reddot:
-  # display: false                      # 游戏内是否显示红点
+Reddot:
+  display: false                      # 游戏内是否显示红点
 Announce:
   remind: true                          # 登入游戏公告提醒
   alert: true                           # 游戏内弹窗公告

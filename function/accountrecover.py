@@ -2,12 +2,12 @@ from __main__ import app
 import re
 import random
 import string
-import settings.define as define
+import settings.repositories as repositories
 
 from flask_caching import Cache
 from flask_mail import Message
 from settings.database import get_db
-from settings.config import get_config
+from settings.loadconfig import get_config
 from settings.utils import password_hash
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app
@@ -56,13 +56,13 @@ def recover_code():
     email = request.form.get('email')
     email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
     if not re.match(email_pattern, email):
-        return json_rsp_with_msg(define.RES_FAIL, "邮箱格式不正确", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "邮箱格式不正确", {})
     cursor = get_db().cursor()
     user_query = "SELECT * FROM `accounts` WHERE `email` = %s"
     cursor.execute(user_query, (email,))
     user = cursor.fetchone()
     if not user:
-        return json_rsp_with_msg(define.RES_FAIL, "该邮箱不存在", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "该邮箱不存在", {})
     reset_code = ''.join(random.choices(string.digits, k=4))
     mail = current_app.extensions['mail']
     msg = Message(f"重置密码请求", recipients=[email])
@@ -70,6 +70,6 @@ def recover_code():
     try:
         mail.send(msg)
     except:
-        return json_rsp_with_msg(define.RES_FAIL, "未知异常，请联系管理员", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "未知异常，请联系管理员", {})
     cache.set(email, reset_code, timeout=60 * 5)
-    return json_rsp_with_msg(define.RES_SUCCESS, "验证码发送成功，请查收邮箱", {})
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "验证码发送成功，请查收邮箱", {})

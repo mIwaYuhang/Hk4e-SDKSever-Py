@@ -1,15 +1,14 @@
 from __main__ import app
-
 import re
 import random
 import string
-import settings.define as define
+import settings.repositories as repositories
 
 from time import time as epoch
 from flask_mail import Message
 from flask_caching import Cache
 from settings.database import get_db
-from settings.config import get_config
+from settings.loadconfig import get_config
 from settings.utils import password_hash
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app
@@ -59,7 +58,7 @@ def account_register():
         else:
             cursor.execute("INSERT INTO `accounts` (`name`, `mobile`, `email`, `password`, `type`, `epoch_created`) "
                            "VALUES (%s, %s, %s, %s, %s, %s)",
-                           (username, mobile, email, password_hash(password), define.ACCOUNT_TYPE_NORMAL, int(epoch())))
+                           (username, mobile, email, password_hash(password), repositories.ACCOUNT_TYPE_NORMAL, int(epoch())))
             flash('游戏账号注册成功，请返回登录', 'success')
             cache.delete(email)
     return render_template("account/register.tmpl")
@@ -70,13 +69,13 @@ def register_code():
     email = request.form.get('email')
     email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
     if not re.match(email_pattern, email):
-        return json_rsp_with_msg(define.RES_FAIL, "邮箱格式不正确", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "邮箱格式不正确", {})
     cursor = get_db().cursor()
     user_query = "SELECT * FROM `accounts` WHERE `email` = %s"
     cursor.execute(user_query, (email,))
     user = cursor.fetchone()
     if user:
-        return json_rsp_with_msg(define.RES_FAIL, "邮箱已经被注册了", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "邮箱已经被注册了", {})
     verification_code = ''.join(random.choices(string.digits, k=4))
     mail = current_app.extensions['mail']
     msg = Message(f"注册验证", recipients=[email])
@@ -84,6 +83,6 @@ def register_code():
     try:
         mail.send(msg)
     except:
-        return json_rsp_with_msg(define.RES_FAIL, "未知异常，请联系管理员", {})
+        return json_rsp_with_msg(repositories.RES_FAIL, "未知异常，请联系管理员", {})
     cache.set(email, verification_code, timeout=60*5)
-    return json_rsp_with_msg(define.RES_SUCCESS, "验证码发送成功，请查收邮箱", {})
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "验证码发送成功，请查收邮箱", {})
