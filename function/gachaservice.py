@@ -36,9 +36,9 @@ def gacha_info(id):
     except Exception as err:
         print(
             f"Unexpected {err=}, {type(err)=} while loading textmap for {language=}")
-    return render_template("gacha/details.tmpl", schedule=schedule, textmap=textmap, id=id), 203
+    return render_template("gacha/details.tmpl", schedule=schedule, textmap=textmap, id=id)
 
 # 祈愿记录
 @app.route('/gacha/record/<int:type>', methods=['GET'])
 def gacha_log(type):
-    return render_template("gacha/history.tmpl"), 203
+    return render_template("gacha/history.tmpl")

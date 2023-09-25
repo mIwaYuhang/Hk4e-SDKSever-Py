@@ -3,10 +3,11 @@ import yaml
 import settings.define as define
 import data.proto.QueryRegionListHttpRsp_pb2 as RegionList
 
-from flask import Response
+from flask import Response, abort, request
 from base64 import b64encode
 from flask_caching import Cache
 from settings.config import get_config
+from settings.utils import forward_request
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor
@@ -48,12 +49,18 @@ def query_dispatch():
     serialized_data = updated_region_list.SerializeToString()
     base64_str = b64encode(serialized_data).decode()
     return Response(base64_str, content_type='text/plain')
-# 实验性解析QueryCurRegion(暂时留空 先不写)
+# 实验性解析QueryCurRegion(live版本服务端dispatchurl必须要填写sdk的地址，通过sdk来传递区服信息)
 # version=OSRELWin2.8.0 lang=2 platform=3 binary=1 time=348 channel_id=1 sub_channel_id=1 account_type=1 dispatchSeed=caffbdd6d7460dff key_id=3
 @app.route('/query_region/<name>', methods=['GET'])
-@app.route('/query_cur_region/<name>', methods=['GET'])
-def query_cur_region():
-    return "Not found"
+def query_cur_region(name):
+    try:
+        return forward_request(request, f"{get_config()['Dispatch']['list'][name]}/query_cur_region?{request.query_string.decode()}")
+    except KeyError:
+        print(f"未知的Region={name}")
+        abort(404)
+    except Exception as err:
+        print(f"处理请求事件发生以外错误{err=}, {type(err)=}")
+        abort(500)
 
 '''
 全局dispatch (转发到dispatch后返回结果)

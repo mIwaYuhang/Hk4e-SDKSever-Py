@@ -6,7 +6,7 @@ Setting:
   reload: false
   debug: false
   threaded: true
-  high_frequency_logs: false             # sdk是否启用高频日志
+  high_frequency_logs: true             # sdk是否启用高频日志
   secret_key: "cokeserver2022"
 Database:
   host: 192.168.1.8
@@ -63,24 +63,27 @@ Other:
   list_price_tierv2_enable: true
 
 # Global Settings
-#Dispatch:
-#  global: "http://192.168.1.8:21041"
-#  local:
-#    dev_docker: "http://192.168.1.8:21041"
-
+Dispatch:
+  list:
+    dev_docker: "http://192.168.1.8:21041"
+    dev_client: "http://192.168.1.8:21041"
+    dev_common: "http://192.168.1.8:21041"
+# Dispatch配置仅支持live版本的服务端 因为他们需要绑定SDK
+# 我推荐在t_sdk_config表中设置本SDK地址 以免账号验证失败(不推荐设置127.0.0.1)
+# 你应该发现了规律：每个GateServer/dispatchurl后都有/query_region/xxxx，这是live版本专属的标识
+# 也就是说 你配置了多少个区 那么Dispatch/local下就该有多少url，懂了吗？
+# 举个例子：客户端访问了1区(http://192.168.1.5:21000/query_region/dev_docker),那么SDK就会去Dispatch配置找相应的标识url来解析信息(dev_docker)
+# 如果你是dev版本(如3.2/3.4),Url为'DispatchIp:DispatchPort/query_cur_region/',则直接配置Gateserver即可
 Gateserver:
   - name: dev_docker
-    title: GenshinServer-28live
-    dispatchUrl: http://192.168.1.8:21000/query_region/dev_docker
+    title: live-正式渠道
+    dispatchUrl: http://192.168.1.5:21000/query_region/dev_docker
   - name: dev_client
     title: Dev-测试渠道1
-    dispatchUrl: http://192.168.1.5:21000/query_region/dev_docker
+    dispatchUrl: http://192.168.1.5:21000/query_region/dev_client
   - name: dev_common 
     title: Dev-测试渠道2
-    dispatchUrl: http://127.0.0.1:21041/query_region/dev_common
-  - name: dev_gio
-    title: Dev-测试渠道3
-    dispatchUrl: http://127.0.0.1:20001/query_cur_region
+    dispatchUrl: http://192.168.1.5:21000/query_region/dev_common
 
 Crypto:
   rsa:
