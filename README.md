@@ -1,5 +1,6 @@
 # Hk4e-SDKSever-Py
 Python-Flask实现游戏登录验证(Python版本：3.10)
+![image](https://github.com/CokeSR/CokeSR/blob/CokeSR/Public/images/Hk4e-SDKServer-Py/photo.png)
 # 使用说明
 - 我也不知道有多少功能 等写差不多了再写
 # 邮件功能说明
