@@ -34,7 +34,7 @@ def combo_granter_api_config():
             "enable_announce_pic_popup": get_config()["Player"]["enable_announce_pic_popup"],  
             "protocol": get_config()["Player"]["protocol"],  
             "qr_enabled": get_config()["Player"]["qr_enabled"],
-            "app_name": "原神海外",
+            "app_name": "原神",
     		"qr_enabled_apps": {
 			"bbs": get_config()['Player']['qr_bbs'],
 			"cloud": get_config()['Player']['qr_cloud']
@@ -44,7 +44,7 @@ def combo_granter_api_config():
 			"bbs": "",
 			"cloud": ""
 		    },
-            "qr_cloud_display_name": "",
+            "qr_cloud_display_name": "云·原神",
 		    "enable_user_center": get_config()['Player']['enable_user_center'],
 		    "functional_switch_configs": {}
         }
@@ -173,7 +173,7 @@ def combo_box_api_config_sw_precache():
     return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
         "data": {
             "vals": {
-                "url":"",
+                "url":"https://webstatic.mihoyo.com/sw.html",
                 "enable": get_config()["Other"]["serviceworker"]         # 是否加载ServiceWorker进行分析
             }
         }

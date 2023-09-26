@@ -40,7 +40,7 @@ def query_dispatch():
         region_info = response.region_list.add()
         region_info.name = entry['name']
         region_info.title = entry['title']
-        region_info.type = "DEV_PUBLIC"
+        region_info.type = "PRODUTC"
         region_info.dispatch_url = entry['dispatchUrl']
     custom_config = '{"sdkenv":"0","checkdevice":"false","loadPatch":"false","showexception":"false","regionConfig":"pm|fk|add","downloadMode":"0"}'
     encrypted_config = bytearray()
