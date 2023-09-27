@@ -1,14 +1,39 @@
-from flask import abort, request
-import requests
+import sys
+import yaml
 import bcrypt
 import hashlib
+import requests
 import geoip2.database
 import settings.repositories as repositories
 
 from functools import wraps
+from flask import abort, request
 from settings.loadconfig import get_config
+from settings.restoreconfig import recover_config
 
 #=====================函数库=====================#
+# 检查[Config]文件是否存在并告知是否创建
+# database dispatch 读取的是这里
+def check_config_exists():
+   config = None
+   try:
+      with open(repositories.CONFIG_FILE_PATH, encoding='utf-8') as file:
+         config = yaml.safe_load(file)
+   except FileNotFoundError:
+      print("#=====================未检测到[Config]文件！运行失败=====================#")
+      select = input(">> 是否创建新的[Config]文件？(y/n):")
+      if select == 'y' or select == 'Y':
+         recover_config()
+         print(">> [Config]文件创建成功")
+         sys.exit(1)
+      elif select == 'n' or select == 'N':
+         print(">> 取消创建[Config]文件，停止运行...")
+         sys.exit(1)
+      else:
+         print(">> 非法输入！停止运行...")
+         sys.exit(1)
+   return config
+
 # 通过IP来检查是哪个国家
 def get_country_for_ip(ip):
    with geoip2.database.Reader(repositories.GEOIP2_DB_PATH) as reader:
@@ -23,15 +48,16 @@ def get_country_for_ip(ip):
 
 # 白名单准入
 def ip_whitelist(allowed_ips):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if request.remote_addr not in allowed_ips:
-                abort(403)
-            return func(*args, **kwargs)
-        return wrapper
-    return decorator
+   def decorator(func):
+      @wraps(func)
+      def wrapper(*args, **kwargs):
+         if request.remote_addr not in allowed_ips:
+            abort(403)
+         return func(*args, **kwargs)
+      return wrapper
+   return decorator
 
+# 信息处理
 def forward_request(request, url):
    return requests.get(url, headers={"miHoYoCloudClientIP": request_ip(request)}).content
 
@@ -57,6 +83,7 @@ def password_verify(password, hashed):
    h.update(password.encode())
    return bcrypt.checkpw(h.hexdigest().encode(), hashed)
 
+# 信息安全
 def mask_string(text):
    if len(text) < 4:
       return "*" * len(text)                          # 如果源小于4个字符，则将其全部屏蔽

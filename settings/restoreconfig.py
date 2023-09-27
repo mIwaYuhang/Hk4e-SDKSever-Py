@@ -1,8 +1,9 @@
+import os
 import yaml
 import settings.repositories as repositories
 
 #=====================[Config]恢复=====================#
-# 对于在根目录下没有config或破损的留一个模板来创建(未实装 先占位)
+# 对于在根目录下没有config或破损的留一个模板来创建
 def recover_config():
     config = {
             'Setting': {
@@ -85,17 +86,17 @@ def recover_config():
             'Gateserver': [
                 {
                     'name': 'dev_docker',
-                    'title': 'live-正式渠道',
+                    'title': 'live-FormalChannel',
                     'dispatchUrl': 'http://{{%SDK_ADDRESS%}}:{{%YOUR_SDK_PORT%}}/query_region/dev_docker'
                 },
                 {
                     'name': 'dev_client',
-                    'title': 'Dev-测试渠道1',
+                    'title': 'Dev-TestChannel-1',
                     'dispatchUrl': 'http://{{%SDK_ADDRESS%}}:{{%YOUR_SDK_PORT%}}/query_region/dev_client'
                 },
                 {
                     'name': 'dev_common',
-                    'title': 'Dev-测试渠道2',
+                    'title': 'Dev-TestChannel-2',
                     'dispatchUrl': 'http://{{%SDK_ADDRESS%}}:{{%YOUR_SDK_PORT%}}/query_region/dev_common'
                 }
             ],
@@ -118,6 +119,5 @@ def recover_config():
             }
         }
     config_file_path = repositories.CONFIG_FILE_PATH
-    with open(config_file_path, 'w') as f:
-        yaml.dump(config, f)
-recover_config()
+    with open(config_file_path, 'wb') as f:         # 使用二进制写入模式 让文件编排原封不动
+        yaml.dump(config, f, encoding='utf-8', sort_keys=False)

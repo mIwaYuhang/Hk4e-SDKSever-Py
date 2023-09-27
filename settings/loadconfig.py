@@ -11,6 +11,6 @@ def load_config():
 def get_config():
     config = getattr(g, '_config', None)
     if config is None:
-        with open(repositories.CONFIG_FILE_PATH, encoding='utf-8') as file:
+        with open(repositories.CONFIG_FILE_PATH, encoding='utf-8'):
             config = g._config = load_config()
     return config

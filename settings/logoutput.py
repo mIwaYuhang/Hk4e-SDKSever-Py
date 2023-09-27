@@ -51,4 +51,4 @@ def log_request_content():
     if enable_request_logging:
         content = request.get_data(as_text=True)
         encoded_content = content.encode('utf-8')
-        logging.info(f"[客户端上报]: {encoded_content}")
+        logging.info(f"[信息上报]: {encoded_content}")

@@ -2,9 +2,10 @@ from flask import Flask
 app = Flask(__name__)
 import sys
 import codecs
-import function.dispatch
 import settings.logoutput
+import function.dispatch
 import function.apiservice
+import function.safeservice
 import function.gachaservice
 import function.otherservice
 import function.announcement
@@ -13,13 +14,12 @@ import function.accountverify
 import function.accountrecover
 import function.accountregister
 import function.rechargeservice
-import function.safeservice
 
 from flask_mail import Mail
 from werkzeug.serving import run_simple
 from settings.loadconfig import load_config
-from werkzeug.middleware.proxy_fix import ProxyFix
 from settings.database import initialize_database
+from werkzeug.middleware.proxy_fix import ProxyFix
 from settings.checkstatus import check_region , check_dispatch , check_config , check_mysql_connection , check_database_exists
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
@@ -51,22 +51,22 @@ if __name__ == '__main__':
         raise Exception("请提供命令行参数: serve 或 initdb")
     config = load_config()
     command = sys.argv[1]
-    if command == "serve":
+    if command == "serve": 
+        if not check_config():
+            print("#=====================[Config]文件校验失败！请检查服务配置=====================#")
+            sys.exit(1)
         if not check_mysql_connection():
             print("#======================Mysql连接失败！请检查服务配置======================#")
             sys.exit(1)
         if not check_database_exists():
             print("#======================Mysql库查询失败！请检查服务配置======================#")
             sys.exit(1)
-        if not check_config():
-            print("#=====================Config文件校验失败！请检查服务配置=====================#")
-            sys.exit(1)
         if not check_region():
             print("#=====================Region读取失败！请检查[Config]配置=====================#")
             sys.exit(1)
         if not check_dispatch():
             print("#=====================Dispatch读取失败！请检查[Config]配置=====================#")
-            sys.exit(1)     
+            sys.exit(1)  
         start_flask_server(config)
     elif command == "initdb":
         initialize_database()

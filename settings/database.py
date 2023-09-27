@@ -1,12 +1,11 @@
 from __main__ import app
 import sys
-import yaml
 import pymysql
 import settings.database as database
-import settings.repositories as repositories
 
-from settings.checkstatus import check_mysql_connection
 from flask import g
+from settings.utils import check_config_exists
+from settings.checkstatus import check_mysql_connection
 
 #=====================数据库创建=====================#
 def dict_factory(cursor, row):
@@ -15,15 +14,10 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-def get_config():
-    with open(repositories.CONFIG_FILE_PATH, encoding='utf-8') as file:
-        config = yaml.safe_load(file)
-    return config
-
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        config = get_config()['Database']
+        config = check_config_exists()['Database']
         db = g._database = pymysql.connect(
             host=config['host'],
             user=config['user'],
@@ -34,8 +28,8 @@ def get_db():
         )
     return db
 
-def init_db(auto_create = get_config()['Database']['autocreate']):
-    config = get_config()['Database']
+def init_db(auto_create = check_config_exists()['Database']['autocreate']):
+    config = check_config_exists()['Database']
     conn = pymysql.connect(
         host=config['host'],
         user=config['user'],
@@ -56,14 +50,13 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
     cursor.execute("DROP TABLE IF EXISTS `combo_tokens`")
     
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
-                     `uid` INT AUTO_INCREMENT COMMENT '玩家UID',
+                     `uid` INT AUTO_INCREMENT PRIMARY KEY COMMENT '玩家UID',
                      `name` VARCHAR(255) UNIQUE COMMENT '用户名',
                      `mobile` VARCHAR(255) UNIQUE COMMENT '手机号',
                      `email` VARCHAR(255) UNIQUE COMMENT '电子邮件',
                      `password` VARCHAR(255) COMMENT '哈希密码',
                      `type` INT NOT NULL COMMENT '类型',
-                     `epoch_created` INT NOT NULL COMMENT '时间戳',
-                     PRIMARY KEY(`uid`,`name`,`mobile`,`email`)
+                     `epoch_created` INT NOT NULL COMMENT '时间戳'
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='玩家账号信息表'
     """)
@@ -126,7 +119,6 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
 
     conn.commit()
     conn.close()
-
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
