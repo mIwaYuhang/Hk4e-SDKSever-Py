@@ -147,26 +147,6 @@ def combo_box_api_config_sdk_combo():
         }
     })
 
-# 红点配置 一般infos为空 特别写的
-@app.route('/hk4e_cn/combo/red_dot/list', methods=['POST'])
-@app.route('/hk4e_global/combo/red_dot/list', methods=['POST'])
-def red_dot():
-    return json_rsp(repositories.RES_SUCCESS, "ok", {
-        "infos": []
-    })
-"""
-def red_dot():
-    return json_rsp(define.RES_SUCCESS, "ok", {
-        "infos": [
-            {
-                "red_point_type": 2201,
-                "content_id": 184,
-                "display": get_config()["Reddot"]["display"]
-            }
-        ]
-    })
-"""
-
 # 预加载
 @app.route('/combo/box/api/config/sw/precache', methods=['GET'])
 def combo_box_api_config_sw_precache():

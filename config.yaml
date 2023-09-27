@@ -67,8 +67,8 @@ Dispatch:
   list:
     cn_gf01: "http://192.168.1.8:21041"
     dev_client: "http://192.168.1.8:21041"
-    dev_common: "http://192.168.1.8:21041"
     dev_docker: "http://192.168.1.8:21041"
+    dev_gio: "http://192.168.1.8:21041"
 # Dispatch配置仅支持live版本的服务端 因为他们需要绑定SDK
 # 我推荐在t_sdk_config表中设置本SDK地址 以免账号验证失败(不推荐设置127.0.0.1)
 # 你应该发现了规律：每个GateServer/dispatchurl后都有/query_region/xxxx，这是live版本专属的标识
@@ -81,13 +81,13 @@ Gateserver:
     dispatchUrl: http://192.168.1.5:21000/query_region/cn_gf01
   - name: dev_client
     title: Dev-测试渠道1
-    dispatchUrl: http://192.168.1.5:21000/query_region/dev_client
-  - name: dev_common 
+    dispatchUrl: http://192.168.1.8:21000/query_region/dev_client
+  - name: dev_docker 
     title: Dev-测试渠道2
-    dispatchUrl: http://192.168.1.5:21000/query_region/dev_common
-  - name: dev_docker
-    title: Dev-测试渠道3
     dispatchUrl: http://192.168.1.5:21000/query_region/dev_docker
+  - name: dev_gio
+    title: Dev-测试渠道3
+    dispatchUrl: http://192.168.1.8:21041/query_cur_region
 
 Crypto:
   rsa:

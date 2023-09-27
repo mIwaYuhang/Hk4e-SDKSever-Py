@@ -1,9 +1,11 @@
+from flask import abort, request
 import requests
 import bcrypt
 import hashlib
 import geoip2.database
 import settings.repositories as repositories
 
+from functools import wraps
 from settings.loadconfig import get_config
 
 #=====================函数库=====================#
@@ -19,15 +21,29 @@ def get_country_for_ip(ip):
          pass
    return None
 
+# 白名单准入
+def ip_whitelist(allowed_ips):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if request.remote_addr not in allowed_ips:
+                abort(403)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def forward_request(request, url):
+   return requests.get(url, headers={"miHoYoCloudClientIP": request_ip(request)}).content
+
+def forward_request_database(request, url, data):
+   return requests.post(url, headers={"miHoYoCloudClientIP": request_ip(request)}, data=data)  
+
 def request_ip(request):
    return request.remote_addr
 
 def chunked(size, source):
    for i in range(0, len(source), size):
       yield source[i:i+size]
-
-def forward_request(request, url):
-   return requests.get(url, headers={"miHoYoCloudClientIP": request_ip(request)}).content
 
 # 密码保存
 def password_hash(password):

@@ -13,6 +13,14 @@ def inject_config():
     config = get_config()
     return {'config': config}
 
+def json_rsp(code, message, data=None):
+    response = {
+        "code": code,
+        "message": message
+    }
+    if data is not None:
+        response["data"] = data
+    return response
 #====================SDKServer====================#
 # 首页
 @app.route('/')
@@ -72,6 +80,25 @@ def abtest_config_experiment_list():
 def sdk_log():
     return json_rsp(repositories.RES_SUCCESS, {})
 
+# 红点配置 一般infos为空 特别写的
+@app.route('/hk4e_cn/combo/red_dot/list', methods=['POST'])
+@app.route('/hk4e_global/combo/red_dot/list', methods=['POST'])
+def red_dot():
+    return json_rsp(repositories.RES_SUCCESS, "ok", {
+        "infos": []
+    })
+"""
+def red_dot():
+    return json_rsp(define.RES_SUCCESS, "ok", {
+        "infos": [
+            {
+                "red_point_type": 2201,
+                "content_id": 184,
+                "display": get_config()["Reddot"]["display"]
+            }
+        ]
+    })
+"""
 #======================mi18n======================#
 @app.route('/admin/mi18n/plat_cn/m2020030410/m2020030410-version.json', methods=['GET'])
 @app.route('/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json', methods=['GET'])

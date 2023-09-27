@@ -50,60 +50,75 @@ def init_db(auto_create = get_config()['Database']['autocreate']):
     cursor.execute("DROP TABLE IF EXISTS `accounts`")
     cursor.execute("DROP TABLE IF EXISTS `accounts_tokens`")
     cursor.execute("DROP TABLE IF EXISTS `accounts_guests`")
+    cursor.execute("DROP TABLE IF EXISTS `accounts_events`")
     cursor.execute("DROP TABLE IF EXISTS `accounts_thirdparty`")
     cursor.execute("DROP TABLE IF EXISTS `thirdparty_tokens`")
     cursor.execute("DROP TABLE IF EXISTS `combo_tokens`")
     
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts` (
-                     `uid` INT AUTO_INCREMENT PRIMARY KEY,
-                     `name` VARCHAR(255) UNIQUE,
-                     `mobile` VARCHAR(255) UNIQUE,
-                     `email` VARCHAR(255) UNIQUE,
-                     `password` VARCHAR(255),
-                     `type` INT NOT NULL,
-                     `epoch_created` INT NOT NULL
+                     `uid` INT AUTO_INCREMENT COMMENT '玩家UID',
+                     `name` VARCHAR(255) UNIQUE COMMENT '用户名',
+                     `mobile` VARCHAR(255) UNIQUE COMMENT '手机号',
+                     `email` VARCHAR(255) UNIQUE COMMENT '电子邮件',
+                     `password` VARCHAR(255) COMMENT '哈希密码',
+                     `type` INT NOT NULL COMMENT '类型',
+                     `epoch_created` INT NOT NULL COMMENT '时间戳',
+                     PRIMARY KEY(`uid`,`name`,`mobile`,`email`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='玩家账号信息表'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_tokens` (
-                     `uid` INT NOT NULL,
-                     `token` VARCHAR(255) NOT NULL,
-                     `device` VARCHAR(255) NOT NULL,
-                     `ip` VARCHAR(255) NOT NULL,
-                     `epoch_generated` INT NOT NULL,
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `token` VARCHAR(255) NOT NULL COMMENT '登录Token',
+                     `device` VARCHAR(255) NOT NULL COMMENT '设备ID',
+                     `ip` VARCHAR(255) NOT NULL COMMENT '登录IP',
+                     `epoch_generated` INT NOT NULL COMMENT '时间戳',
                      PRIMARY KEY(`uid`,`token`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='账号登录token'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_guests` (
-                     `uid` INT NOT NULL,
-                     `device` VARCHAR(255) NOT NULL,
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `device` VARCHAR(255) NOT NULL COMMENT '设备ID',
                      PRIMARY KEY(`uid`,`device`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='游客登录信息表'
     """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_events` (
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `method` VARCHAR(255) NOT NULL COMMENT '登录方式',
+                     `account_tpye` INT NOT NULL COMMENT '账号类型',
+                     `account_id` INT NOT NULL COMMENT '账号ID',
+                     `platform` INT NOT NULL COMMENT '平台',
+                     `region` VARCHAR(255) NOT NULL COMMENT '区服信息',
+                     `biz_game` VARCHAR(255) NOT NULL,
+                     `epoch_created` INT NOT NULL COMMENT '时间戳',
+                     PRIMARY KEY(`epoch_created`)
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                  COMMENT='账号活动记录表 由GameServer控制'
+    """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `accounts_thirdparty` (
-                     `uid` INT NOT NULL,
-                     `type` INT NOT NULL,
-                     `external_name` VARCHAR(255) NOT NULL,
-                     `external_id` INT NOT NULL,
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `type` INT NOT NULL COMMENT '类型',
+                     `external_name` VARCHAR(255) NOT NULL COMMENT '标识名称',
+                     `external_id` INT NOT NULL COMMENT '标识ID',
                      PRIMARY KEY(`uid`,`type`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='第三方账号登录信息表'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `thirdparty_tokens` (
-                     `uid` INT NOT NULL,
-                     `type` INT NOT NULL,
-                     `token` VARCHAR(255) NOT NULL
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `type` INT NOT NULL COMMENT '类型',
+                     `token` VARCHAR(255) NOT NULL COMMENT '登录Token'
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='第三方账号登录token'
     """)
     cursor.execute("""CREATE TABLE IF NOT EXISTS `combo_tokens` (
-                     `uid` INT NOT NULL,
-                     `token` VARCHAR(255) NOT NULL,
-                     `device` VARCHAR(255) NOT NULL,
-                     `ip` VARCHAR(255) NOT NULL,
-                     `epoch_generated` INT NOT NULL,
+                     `uid` INT NOT NULL COMMENT '玩家UID',
+                     `token` VARCHAR(255) NOT NULL COMMENT '登录Token',
+                     `device` VARCHAR(255) NOT NULL COMMENT '设备ID',
+                     `ip` VARCHAR(255) NOT NULL COMMENT '登录IP',
+                     `epoch_generated` INT NOT NULL COMMENT '时间戳',
                      PRIMARY KEY(`uid`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
                   COMMENT='设备信息token'
