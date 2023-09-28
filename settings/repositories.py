@@ -2,18 +2,19 @@
 MI18N_PATH = './data/mi18n'
 CONFIG_FILE_PATH = "./config.yaml"
 GEOIP2_DB_PATH = "./data/GeoLite2-Country.mmdb"
-AUTHVERIFY_KEY_PATH = "./data/key/authverify.pem"
-PASSWDWORD_KEY_PATH = "./data/key/password.pem"
+AUTHVERIFY_KEY_PATH = "./data/key/pems/authverify.pem"
+PASSWDWORD_KEY_PATH = "./data/key/pems/password.pem"
 
-DISPATCH_KEY = "./data/key/dispatchKey.bin"
-DISPATCH_SEED = "./data/key/dispatchSeed.bin"
-
+DISPATCH_KEY = "./data/key/bins/dispatchkey.bin"
+DISPATCH_SEED = "./data/key/bins/dispatchseed.bin"
 
 GACHA_TEXTMAP_PATH = './data/gacha/textmap'
 GACHA_SCHEDULE_PATH = './data/gacha/schedule'
 
-SHOPWINDOW_TIERS_PATH = "./data/shopwindow/tiers.json"
-SHOPWINDOW_PAY_TYPES_PATH = "./data/shopwindow/pay_types.json"
+SHOPWINDOW_TIERS_PATH_CN = "./data/shopwindow/cn/tiers_cn.json"
+SHOPWINDOW_PAY_TYPES_PATH_CN = "./data/shopwindow/cn/pay_types_cn.json"
+SHOPWINDOW_TIERS_PATH_OS = "./data/shopwindow/os/tiers_os.json"
+SHOPWINDOW_PAY_TYPES_PATH_OS = "./data/shopwindow/os/pay_types_os.json"
 
 ANNOUNCE_PATH_INGAME = "./data/announce/game/list.json"
 ANNOUNCE_PATH_INGATE = "./data/announce/gate/list.json"

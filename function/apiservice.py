@@ -171,7 +171,18 @@ def device_fp_get_ext_list():
 		"pkg_str": ""
 	}
     })
-    
+
+# 设备上报
+@app.route('/device-fp/api/getFp',methods=['GET'])
+def device_report():
+    return json_rsp_with_msg(repositories.RES_SUCCESS, "OK", {
+    "data":{
+        "device_fp":"38d7ecd67b187", # 假的
+        "code":200,
+        "msg":"ok"
+    }
+    })
+
 # 抓出来的我也不知道是什么 似乎是玩家登录信息   
 @app.route('/hk4e_cn/combo/guard/api/ping', methods=['POST'])
 @app.route('/hk4e_cn/combo/guard/api/ping2', methods=['POST'])
