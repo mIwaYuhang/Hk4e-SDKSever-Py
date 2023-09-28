@@ -7,7 +7,7 @@ import settings.repositories as repositories
 from flask_caching import Cache
 from flask_mail import Message
 from settings.database import get_db
-from settings.utils import password_hash
+from settings.library import password_hash
 from settings.loadconfig import get_config
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app

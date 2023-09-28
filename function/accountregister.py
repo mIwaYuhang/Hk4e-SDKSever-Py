@@ -8,7 +8,7 @@ from time import time as epoch
 from flask_mail import Message
 from flask_caching import Cache
 from settings.database import get_db
-from settings.utils import password_hash
+from settings.library import password_hash
 from settings.loadconfig import get_config
 from settings.response import json_rsp_with_msg
 from flask import request, render_template, flash, current_app

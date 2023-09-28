@@ -36,6 +36,7 @@ def price_tier_serve_os():
 
 # 支付平台展示1
 @app.route('/plutus/api/v2/listPayPlat', methods = ['GET'])
+@app.route('/hk4e_cn/mdk/tally/tally/listPayPlat', methods = ['POST'])
 def price_pay_types_serve_2():
     file_path = repositories.SHOPWINDOW_PAY_TYPES_PATH_CN
     if os.path.exists(file_path):
@@ -44,7 +45,6 @@ def price_pay_types_serve_2():
         return "Not found"
 
 # 支付平台展示2
-@app.route('/hk4e_cn/mdk/tally/tally/listPayPlat', methods = ['POST'])
 @app.route('/hk4e_global/mdk/tally/tally/listPayPlat', methods = ['POST'])
 def price_pay_types_serve_1():
     file_path = repositories.SHOPWINDOW_PAY_TYPES_PATH_OS

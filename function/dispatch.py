@@ -5,9 +5,9 @@ import data.proto.QueryRegionListHttpRsp_pb2 as RegionList
 
 from base64 import b64encode
 from flask_caching import Cache
-from settings.utils import forward_request
+from settings.library import forward_request
 from flask import Response, abort, request
-from settings.utils import check_config_exists
+from settings.library import check_config_exists
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor

@@ -1,4 +1,5 @@
 import sys
+import rsa
 import yaml
 import bcrypt
 import hashlib
@@ -7,6 +8,7 @@ import geoip2.database
 import settings.repositories as repositories
 
 from functools import wraps
+from base64 import b64decode
 from flask import abort, request
 from settings.loadconfig import get_config
 from settings.restoreconfig import recover_config
@@ -95,3 +97,11 @@ def mask_string(text):
 def mask_email(email):
    text = email.split('@')
    return f"{mask_string(text[0])}@{text[1]}"
+
+#=====================加密解密=====================#
+def decrypt_sdk_authkey(version, message):
+   return rsa.decrypt(b64decode(message), rsa.PublicKey.load_pkcs1(get_config()["Crypto"]["rsa"]["authkey"][version])).decode()
+
+# 密码rsa私钥解密
+def decrypt_rsa_password(message):
+   return rsa.decrypt(b64decode(message), rsa.PrivateKey.load_pkcs1(get_config()["Crypto"]["rsa"]["password"])).decode()

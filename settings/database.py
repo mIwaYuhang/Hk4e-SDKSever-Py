@@ -4,7 +4,7 @@ import pymysql
 import settings.database as database
 
 from flask import g
-from settings.utils import check_config_exists
+from settings.library import check_config_exists
 from settings.checkstatus import check_mysql_connection
 
 #=====================数据库创建=====================#

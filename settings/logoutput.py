@@ -43,7 +43,7 @@ def load_config():
 # 获取请求日志记录配置项
 def get_request_logging_config():
     config = load_config()
-    return config.get('Setting', {}).get('high_frequency_logs', False)
+    return config.get('Setting', {}).get('high_frequency_logs', True)
 
 @app.before_request
 def log_request_content():

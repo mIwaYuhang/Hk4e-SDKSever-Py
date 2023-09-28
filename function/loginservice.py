@@ -10,8 +10,7 @@ from flask_caching import Cache
 from settings.database import get_db
 from settings.loadconfig import get_config
 from settings.response import json_rsp_with_msg
-from settings.crypto import decrypt_rsa_password
-from settings.utils import request_ip, get_country_for_ip, password_verify, mask_string, mask_email
+from settings.library import request_ip, get_country_for_ip, password_verify, mask_string, mask_email,decrypt_rsa_password
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 @app.context_processor

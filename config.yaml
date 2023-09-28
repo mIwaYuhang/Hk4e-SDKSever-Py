@@ -90,8 +90,8 @@ Gateserver:
 
 Crypto:
   rsa:
-    password: "./data/key/passwdword.pem"
-    authkey:  "./data/key/authverify.pem"
+    password: "./data/key/pems/passwdword.pem"
+    authkey:  "./data/key/pems/authverify.pem"
     version:  1
 
 # Accountmanage
